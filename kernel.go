@@ -27,8 +27,10 @@ func ApplyKernel(k Kernel, in *image.Gray, out *image.Gray) {
 	min = math.MaxInt64
 
 	offset := k.Offset()
-	for x := offset; x <= in.Bounds().Dx()-offset; x++ {
-		for y := offset; y <= in.Bounds().Dy()-offset; y++ {
+	bounds := in.Bounds()
+	dx, dy := bounds.Dx(), bounds.Dy()
+	for x := offset; x <= dx-offset; x++ {
+		for y := offset; y <= dy-offset; y++ {
 			val := k.Apply(in, x, y)
 			if val > max {
 				max = val
@@ -38,8 +40,8 @@ func ApplyKernel(k Kernel, in *image.Gray, out *image.Gray) {
 			}
 		}
 	}
-	for x := offset; x <= in.Bounds().Dx()-offset; x++ {
-		for y := offset; y <= in.Bounds().Dy()-offset; y++ {
+	for x := offset; x <= dx-offset; x++ {
+		for y := offset; y <= dy-offset; y++ {
 			val := k.Apply(in, x, y)
 			normVal := uint8(math.MaxUint8 * float64(val-min) / float64(max-min))
 			out.SetGray(x, y, color.Gray{Y: normVal})

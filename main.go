@@ -79,7 +79,7 @@ func appMain(driver gxui.Driver) {
 }
 
 func processImage(img *image.Gray) {
-	normalizeGray(img)
+	ApplyKernel(normalize, img, img)
 	ComputeDirectional(img)
 }
 
