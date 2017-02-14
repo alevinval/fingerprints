@@ -12,17 +12,17 @@ type Kernel interface {
 	Offset() int
 }
 
-func ApplyKernelAsync(k Kernel, in *image.Gray, out *image.Gray) *sync.WaitGroup {
+func DeferredConvolution(k Kernel, in *image.Gray, out *image.Gray) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		ApplyKernel(k, in, out)
+		Convolute(k, in, out)
 		wg.Done()
 	}()
 	return wg
 }
 
-func ApplyKernel(k Kernel, in *image.Gray, out *image.Gray) {
+func Convolute(k Kernel, in *image.Gray, out *image.Gray) {
 	var min, max float64
 	min = math.MaxFloat64
 

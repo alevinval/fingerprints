@@ -80,13 +80,13 @@ func processImage(in *image.Gray) {
 	bounds := in.Bounds()
 	gx, gy := image.NewGray(bounds), image.NewGray(bounds)
 	go func() {
-		ApplyKernel(normalize, in, in)
-		w1 := ApplyKernelAsync(SobelDx, in, gx)
-		w2 := ApplyKernelAsync(SobelDy, in, gy)
+		Convolute(normalize, in, in)
+		w1 := DeferredConvolution(SobelDx, in, gx)
+		w2 := DeferredConvolution(SobelDy, in, gy)
 		w1.Wait()
 		w2.Wait()
-		ApplyKernel(NewDirectionalKernel(gx, gy), in, in)
-		ApplyKernel(NewFilteredDirectional(gx, gy), in, in)
+		Convolute(NewDirectionalKernel(gx, gy), in, in)
+		Convolute(NewFilteredDirectional(gx, gy), in, in)
 	}()
 }
 
