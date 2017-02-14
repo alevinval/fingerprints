@@ -8,23 +8,23 @@ import (
 )
 
 type Kernel interface {
-	Apply(in *image.Gray, x, y int) int
+	Apply(in *image.Gray, x, y int) float64
 	Offset() int
 }
 
-func ApplyKernelAsync(in *image.Gray, out *image.Gray, kernel Kernel) *sync.WaitGroup {
+func ApplyKernelAsync(k Kernel, in *image.Gray, out *image.Gray) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		ApplyKernel(kernel, in, out)
+		ApplyKernel(k, in, out)
 		wg.Done()
 	}()
 	return wg
 }
 
 func ApplyKernel(k Kernel, in *image.Gray, out *image.Gray) {
-	var min, max int
-	min = math.MaxInt64
+	var min, max float64
+	min = math.MaxFloat64
 
 	offset := k.Offset()
 	bounds := in.Bounds()
@@ -43,7 +43,7 @@ func ApplyKernel(k Kernel, in *image.Gray, out *image.Gray) {
 	for x := offset; x <= dx-offset; x++ {
 		for y := offset; y <= dy-offset; y++ {
 			val := k.Apply(in, x, y)
-			normVal := uint8(math.MaxUint8 * float64(val-min) / float64(max-min))
+			normVal := uint8(math.MaxUint8 * (val - min) / (max - min))
 			out.SetGray(x, y, color.Gray{Y: normVal})
 		}
 	}

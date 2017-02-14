@@ -12,6 +12,6 @@ func (k *normalizeKernel) Offset() int {
 	return 0
 }
 
-func (k *normalizeKernel) Apply(in *image.Gray, x, y int) int {
-	return int(in.GrayAt(x, y).Y)
+func (k *normalizeKernel) Apply(in *image.Gray, x, y int) float64 {
+	return float64(in.GrayAt(x, y).Y)
 }

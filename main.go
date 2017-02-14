@@ -73,14 +73,21 @@ func appMain(driver gxui.Driver) {
 			timer.Reset(pause)
 		})
 	})
-
 	window.OnClose(driver.Terminate)
-
 }
 
-func processImage(img *image.Gray) {
-	ApplyKernel(normalize, img, img)
-	ComputeDirectional(img)
+func processImage(in *image.Gray) {
+	bounds := in.Bounds()
+	gx, gy := image.NewGray(bounds), image.NewGray(bounds)
+	go func() {
+		ApplyKernel(normalize, in, in)
+		w1 := ApplyKernelAsync(SobelDx, in, gx)
+		w2 := ApplyKernelAsync(SobelDy, in, gy)
+		w1.Wait()
+		w2.Wait()
+		ApplyKernel(NewDirectionalKernel(gx, gy), in, in)
+		ApplyKernel(NewFilteredDirectional(gx, gy), in, in)
+	}()
 }
 
 func main() {
