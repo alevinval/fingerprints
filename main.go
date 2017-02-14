@@ -8,6 +8,8 @@ import (
 	_ "image/png"
 	"os"
 
+	"time"
+
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
 	"github.com/google/gxui/samples/flags"
@@ -44,30 +46,41 @@ func loadImage(name string) *image.Gray {
 }
 
 func appMain(driver gxui.Driver) {
-	imgSrc := processImage()
+	imgSrc := loadImage("corpus/nist2.jpg")
+
 	widthMax := imgSrc.Bounds().Max
 
 	theme := flags.CreateTheme(driver)
 	window := theme.CreateWindow(widthMax.X, widthMax.Y, "Image viewer")
+
 	window.SetScale(flags.DefaultScaleFactor)
 	window.SetBackgroundBrush(gxui.WhiteBrush)
+
+	go processImage(imgSrc)
 
 	img := theme.CreateImage()
 	window.AddChild(img)
 
-	gray := image.NewRGBA(imgSrc.Bounds())
-	draw.Draw(gray, imgSrc.Bounds(), imgSrc, image.ZP, draw.Src)
-	texture := driver.CreateTexture(gray, 1)
-	img.SetTexture(texture)
+	var timer *time.Timer
+	pause := time.Millisecond * 60
+	timer = time.AfterFunc(pause, func() {
+		driver.Call(func() {
+			gray := image.NewRGBA(imgSrc.Bounds())
+			draw.Draw(gray, imgSrc.Bounds(), imgSrc, image.ZP, draw.Src)
+			texture := driver.CreateTexture(gray, 1)
+			img.SetTexture(texture)
+			window.Redraw()
+			timer.Reset(pause)
+		})
+	})
 
 	window.OnClose(driver.Terminate)
+
 }
 
-func processImage() *image.Gray {
-	img := loadImage("corpus/nist2.jpg")
+func processImage(img *image.Gray) {
 	normalizeGray(img)
-	img = ComputeDirectional(img)
-	return img
+	ComputeDirectional(img)
 }
 
 func main() {
