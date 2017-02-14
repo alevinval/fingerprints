@@ -12,11 +12,11 @@ type fdKernel struct {
 }
 
 func NewFilteredDirectional(gx, gy *image.Gray) *fdKernel {
-	return &fdKernel{size: 9, gx: gx, gy: gy}
+	return &fdKernel{size: Sum9x9.size, gx: gx, gy: gy}
 }
 
 func (k *fdKernel) Offset() int {
-	return 4
+	return Sum9x9.Offset()
 }
 
 func (k *fdKernel) Apply(in *image.Gray, x, y int) float64 {

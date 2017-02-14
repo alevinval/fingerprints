@@ -45,6 +45,7 @@ func Convolute(k Kernel, in *image.Gray, out *image.Gray) {
 			val := k.Apply(in, x, y)
 			normVal := uint8(math.MaxUint8 * (val - min) / (max - min))
 			out.SetGray(x, y, color.Gray{Y: normVal})
+			//time.Sleep(1 * time.Nanosecond)
 		}
 	}
 }

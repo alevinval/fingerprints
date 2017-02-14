@@ -15,7 +15,7 @@ func NewDirectionalKernel(gx, gy *image.Gray) *directionalKernel {
 }
 
 func (k *directionalKernel) Offset() int {
-	return 4
+	return SobelDx.Offset()
 }
 
 func (k *directionalKernel) Apply(in *image.Gray, x, y int) float64 {
