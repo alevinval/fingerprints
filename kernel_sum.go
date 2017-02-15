@@ -1,9 +1,7 @@
 package main
 
-import "image"
-
 var (
-	Sum9x9 = &sumKernel{size: 9}
+	Sum8x8 = &sumKernel{}
 )
 
 type sumKernel struct {
@@ -11,18 +9,16 @@ type sumKernel struct {
 }
 
 func (k *sumKernel) Offset() int {
-	if k.size%2 == 0 {
-		return k.size / 2
-	}
-	return (k.size - 1) / 2
+	return 4
 }
 
-func (k *sumKernel) Apply(in *image.Gray, x, y int) float64 {
-	sum := 0
+func (k *sumKernel) Apply(in *Matrix, x, y int) float64 {
+	sum := 0.0
 	for i := -k.Offset(); i <= k.Offset(); i++ {
 		for j := -k.Offset(); j <= k.Offset(); j++ {
-			sum += int(in.GrayAt(x+i, y+j).Y)
+			val := in.At(x+i, y+j)
+			sum += val * val
 		}
 	}
-	return float64(sum)
+	return sum
 }

@@ -1,18 +1,13 @@
 package main
 
-import (
-	"image"
-	"image/color"
-	"math"
-	"sync"
-)
+import "sync"
 
 type Kernel interface {
-	Apply(in *image.Gray, x, y int) float64
+	Apply(in *Matrix, x, y int) float64
 	Offset() int
 }
 
-func DeferredConvolution(k Kernel, in *image.Gray, out *image.Gray) *sync.WaitGroup {
+func DeferredConvolution(k Kernel, in *Matrix, out *Matrix) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
@@ -22,30 +17,14 @@ func DeferredConvolution(k Kernel, in *image.Gray, out *image.Gray) *sync.WaitGr
 	return wg
 }
 
-func Convolute(k Kernel, in *image.Gray, out *image.Gray) {
-	var min, max float64
-	min = math.MaxFloat64
-
+func Convolute(k Kernel, in *Matrix, out *Matrix) {
 	offset := k.Offset()
 	bounds := in.Bounds()
 	dx, dy := bounds.Dx(), bounds.Dy()
-	for x := offset; x <= dx-offset; x++ {
-		for y := offset; y <= dy-offset; y++ {
-			val := k.Apply(in, x, y)
-			if val > max {
-				max = val
-			}
-			if val < min {
-				min = val
-			}
-		}
-	}
-	for x := offset; x <= dx-offset; x++ {
-		for y := offset; y <= dy-offset; y++ {
-			val := k.Apply(in, x, y)
-			normVal := uint8(math.MaxUint8 * (val - min) / (max - min))
-			out.SetGray(x, y, color.Gray{Y: normVal})
-			//time.Sleep(1 * time.Nanosecond)
+	for x := offset; x < dx-offset; x++ {
+		for y := offset; y < dy-offset; y++ {
+			pixel := k.Apply(in, x, y)
+			out.Set(x, y, pixel)
 		}
 	}
 }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
+	"github.com/google/gxui/math"
 	"github.com/google/gxui/samples/flags"
 	"github.com/nfnt/resize"
 	_ "github.com/nfnt/resize"
@@ -29,7 +30,7 @@ func loadImage(name string) *image.Gray {
 		panic(err)
 	}
 
-	m = resize.Resize(450, 450, m, resize.Bilinear)
+	m = resize.Resize(300, 300, m, resize.Bilinear)
 
 	bounds := m.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
@@ -46,27 +47,36 @@ func loadImage(name string) *image.Gray {
 }
 
 func appMain(driver gxui.Driver) {
-	imgSrc := loadImage("corpus/nist2.jpg")
+	original := loadImage("corpus/nist2.jpg")
+	img := NewMatrixFromGray(original)
+	processImage(driver, img)
+}
 
-	widthMax := imgSrc.Bounds().Max
+var posX, posY = 0, 0
+
+func showImage(driver gxui.Driver, title string, in *image.Gray) {
+	widthMax := in.Bounds().Max
 
 	theme := flags.CreateTheme(driver)
-	window := theme.CreateWindow(widthMax.X, widthMax.Y, "Image viewer")
-
+	window := theme.CreateWindow(widthMax.X, widthMax.Y, title)
+	window.SetPosition(math.NewPoint(posX, posY))
+	posX += widthMax.X
+	if posX%(3*widthMax.X) == 0 {
+		posY += widthMax.X
+		posX = 0
+	}
 	window.SetScale(flags.DefaultScaleFactor)
 	window.SetBackgroundBrush(gxui.WhiteBrush)
-
-	go processImage(imgSrc)
 
 	img := theme.CreateImage()
 	window.AddChild(img)
 
 	var timer *time.Timer
-	pause := time.Millisecond * 60
+	pause := time.Millisecond * 1000
 	timer = time.AfterFunc(pause, func() {
 		driver.Call(func() {
-			gray := image.NewRGBA(imgSrc.Bounds())
-			draw.Draw(gray, imgSrc.Bounds(), imgSrc, image.ZP, draw.Src)
+			gray := image.NewRGBA(in.Bounds())
+			draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
 			texture := driver.CreateTexture(gray, 1)
 			img.SetTexture(texture)
 			window.Redraw()
@@ -76,18 +86,35 @@ func appMain(driver gxui.Driver) {
 	window.OnClose(driver.Terminate)
 }
 
-func processImage(in *image.Gray) {
+func processImage(driver gxui.Driver, in *Matrix) {
 	bounds := in.Bounds()
-	gx, gy := image.NewGray(bounds), image.NewGray(bounds)
-	go func() {
-		Convolute(normalize, in, in)
-		w1 := DeferredConvolution(SobelDx, in, gx)
-		w2 := DeferredConvolution(SobelDy, in, gy)
-		w1.Wait()
-		w2.Wait()
-		Convolute(NewDirectionalKernel(gx, gy), in, in)
-		Convolute(NewFilteredDirectional(gx, gy), in, in)
-	}()
+	normalized := NewMatrix(bounds)
+	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
+	consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
+	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
+	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
+	segmented, _ := NewMatrix(bounds), NewMatrix(bounds)
+
+	showImage(driver, "Original", in.ToGray())
+	Normalize(in, normalized)
+	showImage(driver, "Normalized", normalized.ToGray())
+	Convolute(SobelDx, normalized, gx)
+	Convolute(SobelDy, normalized, gy)
+	Convolute(NewSqrtKernel(gx, gy), in, consistency)
+	Normalize(consistency, normConsistency)
+	showImage(driver, "Normalized Consistency", normConsistency.ToGray())
+
+	Convolute(NewDirectionalKernel(gx, gy), directional, directional)
+	Normalize(directional, normDirectional)
+	showImage(driver, "Directional", normDirectional.ToGray())
+
+	Convolute(NewFilteredDirectional(gx, gy), filteredD, filteredD)
+	Normalize(filteredD, normFilteredD)
+	showImage(driver, "Filtered Directional", normFilteredD.ToGray())
+
+	Convolute(NewFilteredDirectionalSegmented(filteredD), normalized, segmented)
+	//Normalize(segmented, normSegmented)
+	showImage(driver, "Filtered Directional Segmented", segmented.ToGray())
 }
 
 func main() {
