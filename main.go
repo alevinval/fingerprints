@@ -46,7 +46,7 @@ func loadImage(name string) *image.Gray {
 }
 
 func appMain(driver gxui.Driver) {
-	original := loadImage("corpus/nist2.jpg")
+	original := loadImage("corpus/nist1.jpg")
 	img := NewMatrixFromGray(original)
 	processImage(driver, img)
 }
@@ -115,7 +115,17 @@ func processImage(driver gxui.Driver, in *Matrix) {
 	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
 	Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
 	Normalize(segmented, normSegmented)
-	showImage(driver, "Filtered Directional Segmented", normSegmented)
+	showImage(driver, "Filtered Directional Std Dev.", normSegmented)
+
+	// Compute binarized segmented image
+	binarizedSegmented := NewMatrix(bounds)
+	Binarize(normSegmented, binarizedSegmented)
+	showImage(driver, "Binarized Segmented", binarizedSegmented)
+
+	binarizedNorm := NewMatrix(bounds)
+	Binarize(normalized, binarizedNorm)
+	showImage(driver, "Binarized Normalized", binarizedNorm)
+
 }
 
 func main() {
