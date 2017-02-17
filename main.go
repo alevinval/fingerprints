@@ -7,7 +7,6 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
-
 	_ "time"
 
 	"github.com/google/gxui"
@@ -30,7 +29,7 @@ func loadImage(name string) *image.Gray {
 		panic(err)
 	}
 
-	m = resize.Resize(350, 350, m, resize.Bilinear)
+	m = resize.Resize(400, 400, m, resize.Bilinear)
 
 	bounds := m.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
@@ -54,14 +53,14 @@ func appMain(driver gxui.Driver) {
 
 var posX, posY = 0, 0
 
-func showImage(driver gxui.Driver, title string, in *image.Gray) {
+func showImage(driver gxui.Driver, title string, in *Matrix) {
 	bounds := in.Bounds()
 
 	theme := flags.CreateTheme(driver)
 	window := theme.CreateWindow(bounds.Dx(), bounds.Dy(), title)
 	window.SetPosition(math.NewPoint(posX, posY))
 	posX += bounds.Dx()
-	if posX%(3*bounds.Dx()) == 0 {
+	if posX%(4*bounds.Dx()) == 0 {
 		posY += bounds.Dy() + 70
 		posX = 0
 	}
@@ -72,59 +71,51 @@ func showImage(driver gxui.Driver, title string, in *image.Gray) {
 	window.AddChild(img)
 
 	gray := image.NewRGBA(in.Bounds())
-	draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
+	draw.Draw(gray, in.Bounds(), in.ToGray(), image.ZP, draw.Src)
 	texture := driver.CreateTexture(gray, 1)
 	img.SetTexture(texture)
-
-	//var timer *time.Timer
-	//pause := time.Millisecond * 1000
-	//timer = time.AfterFunc(pause, func() {
-	//	driver.Call(func() {
-	//		gray := image.NewRGBA(in.Bounds())
-	//		draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
-	//		texture := driver.CreateTexture(gray, 1)
-	//		img.SetTexture(texture)
-	//		window.Redraw()
-	//		timer.Reset(pause)
-	//	})
-	//})
 	window.OnClose(driver.Terminate)
 }
 
 func processImage(driver gxui.Driver, in *Matrix) {
 	bounds := in.Bounds()
 	normalized := NewMatrix(bounds)
-	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
 
-	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
-	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
-	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
-
-	//showImage(driver, "Original", in.ToGray())
+	showImage(driver, "Original", in)
 	Normalize(in, normalized)
-	showImage(driver, "Normalized", normalized.ToGray())
-	c1 := DeferredConvolution(SobelDx, normalized, gx)
-	c2 := DeferredConvolution(SobelDy, normalized, gy)
+	showImage(driver, "Normalized", normalized)
+
+	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
+	c1 := ParallelConvolution(SobelDx, normalized, gx)
+	c2 := ParallelConvolution(SobelDy, normalized, gy)
 	c1.Wait()
 	c2.Wait()
 
-	// Consistency matrix
-	//consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
-	//Convolute(NewSqrtKernel(gx, gy), in, consistency)
-	//Normalize(consistency, normConsistency)
-	//showImage(driver, "Normalized Consistency", normConsistency.ToGray())
+	//Consistency matrix
+	consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
+	c1 = ParallelConvolution(NewSqrtKernel(gx, gy), in, consistency)
+	c1.Wait()
+	Normalize(consistency, normConsistency)
+	showImage(driver, "Normalized Consistency", normConsistency)
 
-	Convolute(NewDirectionalKernel(gx, gy), directional, directional)
+	// Compute directional
+	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
+	c1 = ParallelConvolution(NewDirectionalKernel(gx, gy), directional, directional)
+	c1.Wait()
 	Normalize(directional, normDirectional)
-	showImage(driver, "Directional", normDirectional.ToGray())
+	showImage(driver, "Directional", normDirectional)
 
+	// Compute filtered directional
+	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
 	Convolute(NewFilteredDirectional(gx, gy, 4), filteredD, filteredD)
 	Normalize(filteredD, normFilteredD)
-	showImage(driver, "Filtered Directional", normFilteredD.ToGray())
+	showImage(driver, "Filtered Directional", normFilteredD)
 
+	// Compute segmented image
+	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
 	Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
 	Normalize(segmented, normSegmented)
-	showImage(driver, "Filtered Directional Segmented", normSegmented.ToGray())
+	showImage(driver, "Filtered Directional Segmented", normSegmented)
 }
 
 func main() {

@@ -1,7 +1,7 @@
 package main
 
 type matrixMulKernel struct {
-	a, b *Matrix
+	a, b   *Matrix
 	offset int
 }
 

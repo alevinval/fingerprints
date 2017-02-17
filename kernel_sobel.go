@@ -6,7 +6,7 @@ var (
 )
 
 type sobel struct {
-	mat  [3][3]float64
+	mat [3][3]float64
 }
 
 func (k *sobel) Offset() int {

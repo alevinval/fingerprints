@@ -7,9 +7,8 @@ func Normalize(in, out *Matrix) {
 	min = math.MaxFloat64
 
 	bounds := in.Bounds()
-	dx, dy := bounds.Dx(), bounds.Dy()
-	for x := 0; x < dx; x++ {
-		for y := 0; y < dy; y++ {
+	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 			val := in.At(x, y)
 			if val > max {
 				max = val
@@ -19,8 +18,8 @@ func Normalize(in, out *Matrix) {
 			}
 		}
 	}
-	for x := 0; x < dx; x++ {
-		for y := 0; y < dy; y++ {
+	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 			pixel := in.At(x, y)
 			normalizedPixel := math.MaxUint8 * (pixel - min) / (max - min)
 			out.Set(x, y, normalizedPixel)
