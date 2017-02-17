@@ -8,7 +8,7 @@ import (
 	_ "image/png"
 	"os"
 
-	"time"
+	_ "time"
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
@@ -30,7 +30,7 @@ func loadImage(name string) *image.Gray {
 		panic(err)
 	}
 
-	m = resize.Resize(300, 300, m, resize.Bilinear)
+	m = resize.Resize(350, 350, m, resize.Bilinear)
 
 	bounds := m.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
@@ -55,14 +55,14 @@ func appMain(driver gxui.Driver) {
 var posX, posY = 0, 0
 
 func showImage(driver gxui.Driver, title string, in *image.Gray) {
-	widthMax := in.Bounds().Max
+	bounds := in.Bounds()
 
 	theme := flags.CreateTheme(driver)
-	window := theme.CreateWindow(widthMax.X, widthMax.Y, title)
+	window := theme.CreateWindow(bounds.Dx(), bounds.Dy(), title)
 	window.SetPosition(math.NewPoint(posX, posY))
-	posX += widthMax.X
-	if posX%(3*widthMax.X) == 0 {
-		posY += widthMax.X
+	posX += bounds.Dx()
+	if posX%(3*bounds.Dx()) == 0 {
+		posY += bounds.Dy() + 70
 		posX = 0
 	}
 	window.SetScale(flags.DefaultScaleFactor)
@@ -71,18 +71,23 @@ func showImage(driver gxui.Driver, title string, in *image.Gray) {
 	img := theme.CreateImage()
 	window.AddChild(img)
 
-	var timer *time.Timer
-	pause := time.Millisecond * 1000
-	timer = time.AfterFunc(pause, func() {
-		driver.Call(func() {
-			gray := image.NewRGBA(in.Bounds())
-			draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
-			texture := driver.CreateTexture(gray, 1)
-			img.SetTexture(texture)
-			window.Redraw()
-			timer.Reset(pause)
-		})
-	})
+	gray := image.NewRGBA(in.Bounds())
+	draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
+	texture := driver.CreateTexture(gray, 1)
+	img.SetTexture(texture)
+
+	//var timer *time.Timer
+	//pause := time.Millisecond * 1000
+	//timer = time.AfterFunc(pause, func() {
+	//	driver.Call(func() {
+	//		gray := image.NewRGBA(in.Bounds())
+	//		draw.Draw(gray, in.Bounds(), in, image.ZP, draw.Src)
+	//		texture := driver.CreateTexture(gray, 1)
+	//		img.SetTexture(texture)
+	//		window.Redraw()
+	//		timer.Reset(pause)
+	//	})
+	//})
 	window.OnClose(driver.Terminate)
 }
 
@@ -90,31 +95,36 @@ func processImage(driver gxui.Driver, in *Matrix) {
 	bounds := in.Bounds()
 	normalized := NewMatrix(bounds)
 	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
-	consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
+
 	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
 	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
-	segmented, _ := NewMatrix(bounds), NewMatrix(bounds)
+	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
 
-	showImage(driver, "Original", in.ToGray())
+	//showImage(driver, "Original", in.ToGray())
 	Normalize(in, normalized)
 	showImage(driver, "Normalized", normalized.ToGray())
-	Convolute(SobelDx, normalized, gx)
-	Convolute(SobelDy, normalized, gy)
-	Convolute(NewSqrtKernel(gx, gy), in, consistency)
-	Normalize(consistency, normConsistency)
-	showImage(driver, "Normalized Consistency", normConsistency.ToGray())
+	c1 := DeferredConvolution(SobelDx, normalized, gx)
+	c2 := DeferredConvolution(SobelDy, normalized, gy)
+	c1.Wait()
+	c2.Wait()
+
+	// Consistency matrix
+	//consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
+	//Convolute(NewSqrtKernel(gx, gy), in, consistency)
+	//Normalize(consistency, normConsistency)
+	//showImage(driver, "Normalized Consistency", normConsistency.ToGray())
 
 	Convolute(NewDirectionalKernel(gx, gy), directional, directional)
 	Normalize(directional, normDirectional)
 	showImage(driver, "Directional", normDirectional.ToGray())
 
-	Convolute(NewFilteredDirectional(gx, gy), filteredD, filteredD)
+	Convolute(NewFilteredDirectional(gx, gy, 4), filteredD, filteredD)
 	Normalize(filteredD, normFilteredD)
 	showImage(driver, "Filtered Directional", normFilteredD.ToGray())
 
-	Convolute(NewFilteredDirectionalSegmented(filteredD), normalized, segmented)
-	//Normalize(segmented, normSegmented)
-	showImage(driver, "Filtered Directional Segmented", segmented.ToGray())
+	Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
+	Normalize(segmented, normSegmented)
+	showImage(driver, "Filtered Directional Segmented", normSegmented.ToGray())
 }
 
 func main() {
