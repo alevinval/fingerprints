@@ -25,6 +25,6 @@ func (k *filteredDirectional) Apply(_ *Matrix, x, y int) float64 {
 	gxx := k.mulGx.Apply(nil, x, y)
 	gyy := k.mulGy.Apply(nil, x, y)
 	gxy := k.mulGxy.Apply(nil, x, y)
-	phy := 0.5 * math.Atan2(2*gxy, gxx-gyy)
+	phy := math.Pi/2 + 0.5*math.Atan2(2*gxy, gxx-gyy)
 	return phy
 }

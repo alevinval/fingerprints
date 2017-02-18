@@ -85,42 +85,42 @@ func processImage(driver gxui.Driver, in *Matrix) {
 	Normalize(in, normalized)
 	showImage(driver, "Normalized", normalized)
 
-	//gx, gy := NewMatrix(bounds), NewMatrix(bounds)
-	//c1 := ParallelConvolution(SobelDx, normalized, gx)
-	//c2 := ParallelConvolution(SobelDy, normalized, gy)
-	//c1.Wait()
-	//c2.Wait()
+	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
+	c1 := ParallelConvolution(SobelDx, normalized, gx)
+	c2 := ParallelConvolution(SobelDy, normalized, gy)
+	c1.Wait()
+	c2.Wait()
 
-	////Consistency matrix
-	//consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
-	//c1 = ParallelConvolution(NewSqrtKernel(gx, gy), in, consistency)
-	//c1.Wait()
-	//Normalize(consistency, normConsistency)
-	//showImage(driver, "Normalized Consistency", normConsistency)
-	//
-	//// Compute directional
-	//directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
-	//c1 = ParallelConvolution(NewDirectionalKernel(gx, gy), directional, directional)
-	//c1.Wait()
-	//Normalize(directional, normDirectional)
-	//showImage(driver, "Directional", normDirectional)
-	//
-	//// Compute filtered directional
-	//filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
-	//Convolute(NewFilteredDirectional(gx, gy, 4), filteredD, filteredD)
-	//Normalize(filteredD, normFilteredD)
-	//showImage(driver, "Filtered Directional", normFilteredD)
-	//
-	//// Compute segmented image
-	//segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
-	//Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
-	//Normalize(segmented, normSegmented)
-	//showImage(driver, "Filtered Directional Std Dev.", normSegmented)
-	//
-	//// Compute binarized segmented image
-	//binarizedSegmented := NewMatrix(bounds)
-	//Binarize(normSegmented, binarizedSegmented)
-	//showImage(driver, "Binarized Segmented", binarizedSegmented)
+	//Consistency matrix
+	consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
+	c1 = ParallelConvolution(NewSqrtKernel(gx, gy), in, consistency)
+	c1.Wait()
+	Normalize(consistency, normConsistency)
+	showImage(driver, "Normalized Consistency", normConsistency)
+
+	// Compute directional
+	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
+	c1 = ParallelConvolution(NewDirectionalKernel(gx, gy), directional, directional)
+	c1.Wait()
+	Normalize(directional, normDirectional)
+	showImage(driver, "Directional", normDirectional)
+
+	// Compute filtered directional
+	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
+	Convolute(NewFilteredDirectional(gx, gy, 4), filteredD, filteredD)
+	Normalize(filteredD, normFilteredD)
+	showImage(driver, "Filtered Directional", normFilteredD)
+
+	// Compute segmented image
+	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
+	Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
+	Normalize(segmented, normSegmented)
+	showImage(driver, "Filtered Directional Std Dev.", normSegmented)
+
+	// Compute binarized segmented image
+	binarizedSegmented := NewMatrix(bounds)
+	Binarize(normSegmented, binarizedSegmented)
+	showImage(driver, "Binarized Segmented", binarizedSegmented)
 
 	// Binarize normalized image
 	binarizedNorm := NewMatrix(bounds)
