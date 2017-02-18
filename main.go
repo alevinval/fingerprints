@@ -129,7 +129,7 @@ func processImage(driver gxui.Driver, in *Matrix) {
 
 	// Skeletonize
 	//skeleton := NewMatrix(bounds)
-	Skeletonize(binarizedNorm, binarizedNorm)
+	Skeletonize(binarizedNorm)
 	showImage(driver, "Skeletonized", binarizedNorm)
 }
 

@@ -1,5 +1,8 @@
 package main
 
+const BLACK = 0
+const WHITE = 255
+
 func Binarize(in, out *Matrix) {
 	var sum float64
 
@@ -15,10 +18,14 @@ func Binarize(in, out *Matrix) {
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 			pixel := in.At(x, y)
 			if pixel < mean/3 {
-				out.Set(x, y, 0)
+				out.Set(x, y, BLACK)
 			} else {
-				out.Set(x, y, 255)
+				out.Set(x, y, WHITE)
 			}
 		}
 	}
+}
+
+func BinarizeEnhancement(in *Matrix) {
+
 }
