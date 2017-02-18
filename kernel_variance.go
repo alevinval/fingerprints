@@ -2,20 +2,20 @@ package main
 
 import "math"
 
-type stdDevKernel struct {
+type varianceKernel struct {
 	phy    *Matrix
 	offset int
 }
 
-func NewStdDevKernel(directional *Matrix, offset int) *stdDevKernel {
-	return &stdDevKernel{phy: directional, offset: offset}
+func NewVarianceKernel(directional *Matrix, offset int) *varianceKernel {
+	return &varianceKernel{phy: directional, offset: offset}
 }
 
-func (k *stdDevKernel) Offset() int {
+func (k *varianceKernel) Offset() int {
 	return k.offset
 }
 
-func (k *stdDevKernel) Apply(in *Matrix, x, y int) float64 {
+func (k *varianceKernel) Apply(in *Matrix, x, y int) float64 {
 	var pos int
 
 	sigSize := float64(k.Offset()*2 + 1)
@@ -46,6 +46,5 @@ func (k *stdDevKernel) Apply(in *Matrix, x, y int) float64 {
 		variance += d * d
 	}
 	variance /= sigSize
-
-	return math.Sqrt(variance)
+	return variance
 }

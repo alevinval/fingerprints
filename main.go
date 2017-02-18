@@ -81,7 +81,7 @@ func processImage(driver gxui.Driver, in *Matrix) {
 	bounds := in.Bounds()
 	normalized := NewMatrix(bounds)
 
-	showImage(driver, "Original", in)
+	//showImage(driver, "Original", in)
 	Normalize(in, normalized)
 	showImage(driver, "Normalized", normalized)
 
@@ -113,7 +113,7 @@ func processImage(driver gxui.Driver, in *Matrix) {
 
 	// Compute segmented image
 	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
-	Convolute(NewStdDevKernel(filteredD, 8), normalized, segmented)
+	Convolute(NewVarianceKernel(filteredD, 8), normalized, segmented)
 	Normalize(segmented, normSegmented)
 	showImage(driver, "Filtered Directional Std Dev.", normSegmented)
 
@@ -127,8 +127,10 @@ func processImage(driver gxui.Driver, in *Matrix) {
 	Binarize(normalized, binarizedNorm)
 	showImage(driver, "Binarized Normalized", binarizedNorm)
 
+	BinarizeEnhancement(binarizedNorm)
+	showImage(driver, "Binarized Enhanced", binarizedNorm)
+
 	// Skeletonize
-	//skeleton := NewMatrix(bounds)
 	Skeletonize(binarizedNorm)
 	showImage(driver, "Skeletonized", binarizedNorm)
 }
