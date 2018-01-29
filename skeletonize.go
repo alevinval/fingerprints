@@ -1,12 +1,17 @@
 package main
 
-func Skeletonize(in *Matrix) {
-	bounds := in.Bounds()
+var conditions []Condition
 
-	conditions := []Condition{
+func init() {
+	conditions = []Condition{
 		new(ConditionLeftBorder), new(ConditionRightBorder),
 		new(ConditionTopBorder), new(ConditionBottomBorder),
 	}
+}
+
+func Skeletonize(in *Matrix) {
+	bounds := in.Bounds()
+
 	changes := true
 	for changes {
 		changes = false
@@ -31,9 +36,7 @@ func Skeletonize(in *Matrix) {
 					}
 				}
 			}
-			if len(toRemove) > 0 {
-				changes = true
-			}
+			changes = len(toRemove) > 0
 			for idx := range toRemove {
 				in.Set(toRemove[idx][0], toRemove[idx][1], WHITE)
 			}

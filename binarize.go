@@ -19,7 +19,7 @@ func Binarize(in, out *Matrix) {
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 			pixel := in.At(x, y)
-			if pixel < mean/3 {
+			if float64(pixel) < mean/math.Pi {
 				out.Set(x, y, BLACK)
 			} else {
 				out.Set(x, y, WHITE)
@@ -108,13 +108,13 @@ func eraseRegion(p, in *Matrix, region int) {
 	bounds := p.Bounds()
 	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
 		for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
-			if int(p.At(x, y)) == region {
-				if in.At(x, y) == WHITE {
-					in.Set(x, y, BLACK)
-				} else {
-					in.Set(x, y, WHITE)
-				}
-
+			value := p.At(x, y)
+			if int(value) != region {
+				continue
+			} else if value == WHITE {
+				in.Set(x, y, BLACK)
+			} else {
+				in.Set(x, y, WHITE)
 			}
 		}
 	}
