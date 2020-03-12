@@ -3,12 +3,15 @@ package main
 import "math"
 
 type varianceKernel struct {
+	BaseKernel
 	phy    *Matrix
 	offset int
 }
 
-func NewVarianceKernel(directional *Matrix, offset int) *varianceKernel {
-	return &varianceKernel{phy: directional, offset: offset}
+func NewVarianceKernel(directional *Matrix) *varianceKernel {
+	k := &varianceKernel{phy: directional, offset: 8}
+	k.BaseKernel = BaseKernel{kernel: k}
+	return k
 }
 
 func (k *varianceKernel) Offset() int {
@@ -21,8 +24,8 @@ func (k *varianceKernel) Apply(in *Matrix, x, y int) float64 {
 	sigSize := float64(k.Offset()*2 + 1)
 	signature := make([]float64, int(sigSize))
 	angle := k.phy.At(x, y) - math.Pi/2
-	for i := x - k.Offset(); i <= x+k.Offset(); i++ {
-		for j := y - k.Offset(); j <= y+k.Offset(); j++ {
+	for j := y - k.Offset(); j <= y+k.Offset(); j++ {
+		for i := x - k.Offset(); i <= x+k.Offset(); i++ {
 			xp := int(float64(i-x)*math.Cos(angle)-float64(j-y)*math.Sin(angle)) + x
 			yp := int(float64(i-x)*math.Sin(angle)+float64(j-y)*math.Cos(angle)) + y
 			if xp >= 0 && xp < in.bounds.Dx() && yp >= 0 && yp < in.bounds.Dy() {

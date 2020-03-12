@@ -5,16 +5,19 @@ import (
 )
 
 type filteredDirectional struct {
+	BaseKernel
 	mulGx, mulGy, mulGxy *matrixMulKernel
 	offset               int
 }
 
 func NewFilteredDirectional(gx, gy *Matrix, offset int) *filteredDirectional {
-	return &filteredDirectional{
+	k := &filteredDirectional{
 		mulGx:  NewKernelMatrixMul(gx, gx, offset),
 		mulGy:  NewKernelMatrixMul(gy, gy, offset),
 		mulGxy: NewKernelMatrixMul(gx, gy, offset),
 		offset: offset}
+	k.BaseKernel = BaseKernel{kernel: k}
+	return k
 }
 
 func (k *filteredDirectional) Offset() int {

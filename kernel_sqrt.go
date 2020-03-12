@@ -3,12 +3,15 @@ package main
 import "math"
 
 type Sqrt struct {
+	BaseKernel
 	a *Matrix
 	b *Matrix
 }
 
 func NewSqrtKernel(a, b *Matrix) *Sqrt {
-	return &Sqrt{a: a, b: b}
+	k := &Sqrt{a: a, b: b}
+	k.BaseKernel = BaseKernel{kernel: k}
+	return k
 }
 
 func (k *Sqrt) Offset() int {

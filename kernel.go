@@ -10,18 +10,11 @@ type Kernel interface {
 	Offset() int
 }
 
-func Convolute(k Kernel, in, out *Matrix) {
-	offset := k.Offset()
-	bounds := in.Bounds()
-	for x := bounds.Min.X + offset; x < bounds.Max.X-offset; x++ {
-		for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
-			pixel := k.Apply(in, x, y)
-			out.Set(x, y, pixel)
-		}
-	}
+type BaseKernel struct {
+	kernel Kernel
 }
 
-func ParallelConvolution(k Kernel, in, out *Matrix) *sync.WaitGroup {
+func (base *BaseKernel) ParallelConvolution(in, out *Matrix) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	sub := generateSubImageBounds(in)
@@ -29,7 +22,7 @@ func ParallelConvolution(k Kernel, in, out *Matrix) *sync.WaitGroup {
 	go func() {
 		wgs := make([]*sync.WaitGroup, 0)
 		for subImage := range sub {
-			w := DeferredConvolution(k, subImage, out)
+			w := base.deferredConvolution(subImage, out)
 			wgs = append(wgs, w)
 		}
 		for _, w := range wgs {
@@ -41,11 +34,22 @@ func ParallelConvolution(k Kernel, in, out *Matrix) *sync.WaitGroup {
 	return wg
 }
 
-func DeferredConvolution(k Kernel, in, out *Matrix) *sync.WaitGroup {
+func (base *BaseKernel) Convolution(in, out *Matrix) {
+	offset := base.kernel.Offset()
+	bounds := in.Bounds()
+	for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
+		for x := bounds.Min.X + offset; x < bounds.Max.X-offset; x++ {
+			pixel := base.kernel.Apply(in, x, y)
+			out.Set(x, y, pixel)
+		}
+	}
+}
+
+func (base *BaseKernel) deferredConvolution(in, out *Matrix) *sync.WaitGroup {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
-		Convolute(k, in, out)
+		base.Convolution(in, out)
 		wg.Done()
 	}()
 	return wg
@@ -54,15 +58,16 @@ func DeferredConvolution(k Kernel, in, out *Matrix) *sync.WaitGroup {
 func generateSubImageBounds(in *Matrix) <-chan *Matrix {
 	ch := make(chan *Matrix)
 	bounds := in.Bounds()
-	blockSize := 200
+	blockSize := bounds.Max.X / 8
+	offset := 6
 	go func() {
 		for x := bounds.Min.X; x < bounds.Max.X; x += blockSize {
-			xp := x + blockSize
+			xp := x + blockSize + offset
 			if xp > bounds.Max.X {
 				xp = bounds.Max.X
 			}
 			for y := bounds.Min.Y; y < bounds.Max.Y; y += blockSize {
-				yp := y + blockSize
+				yp := y + blockSize + offset
 				if yp > bounds.Max.Y {
 					yp = bounds.Max.Y
 				}

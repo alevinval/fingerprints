@@ -17,8 +17,8 @@ func Skeletonize(in *Matrix) {
 		changes = false
 		for _, c := range conditions {
 			toRemove := [][2]int{}
-			for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
-				for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+			for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+				for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
 					if in.At(x, y) != BLACK {
 						continue
 					}

@@ -106,8 +106,8 @@ func fillRegion(p *Matrix, region, x, y, max int) {
 
 func eraseRegion(p, in *Matrix, region int) {
 	bounds := p.Bounds()
-	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
-		for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
 			value := p.At(x, y)
 			if int(value) != region {
 				continue

@@ -3,11 +3,14 @@ package main
 import "math"
 
 type directionalKernel struct {
+	BaseKernel
 	gx, gy *Matrix
 }
 
 func NewDirectionalKernel(gx, gy *Matrix) *directionalKernel {
-	return &directionalKernel{gx: gx, gy: gy}
+	k := &directionalKernel{gx: gx, gy: gy}
+	k.BaseKernel = BaseKernel{kernel: k}
+	return k
 }
 
 func (k *directionalKernel) Offset() int {
