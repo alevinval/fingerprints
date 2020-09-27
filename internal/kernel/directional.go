@@ -6,22 +6,22 @@ import (
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
-type directionalKernel struct {
-	BaseKernel
-	gx, gy *matrix.Matrix
+type directional struct {
+	Base
+	gx, gy *matrix.M
 }
 
-func NewDirectionalKernel(gx, gy *matrix.Matrix) *directionalKernel {
-	k := &directionalKernel{gx: gx, gy: gy}
-	k.BaseKernel = BaseKernel{kernel: k}
+func NewDirectional(gx, gy *matrix.M) *directional {
+	k := &directional{gx: gx, gy: gy}
+	k.Base = Base{kernel: k}
 	return k
 }
 
-func (k *directionalKernel) Offset() int {
+func (k *directional) Offset() int {
 	return 0
 }
 
-func (k *directionalKernel) Apply(_ *matrix.Matrix, x, y int) float64 {
+func (k *directional) Apply(_ *matrix.M, x, y int) float64 {
 	dx := k.gx.At(x, y)
 	dy := k.gy.At(x, y)
 	ang := math.Atan2(dy, dx) + math.Pi/2

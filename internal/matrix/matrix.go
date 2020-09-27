@@ -5,12 +5,12 @@ import (
 	"image/color"
 )
 
-type Matrix struct {
+type M struct {
 	pixels [][]float64
 	bounds image.Rectangle
 }
 
-func NewMatrix(bounds image.Rectangle) *Matrix {
+func New(bounds image.Rectangle) *M {
 	dx, dy := bounds.Dx(), bounds.Dy()
 	if dx != dy {
 		panic("only squared images are supported for the moment")
@@ -21,15 +21,15 @@ func NewMatrix(bounds image.Rectangle) *Matrix {
 		picture[i], pixels = pixels[:dx], pixels[dx:]
 	}
 
-	m := new(Matrix)
+	m := new(M)
 	m.bounds = bounds
 	m.pixels = picture
 	return m
 }
 
-func NewMatrixFromGray(in *image.Gray) *Matrix {
+func NewFromGray(in *image.Gray) *M {
 	bounds := in.Bounds()
-	m := NewMatrix(bounds)
+	m := New(bounds)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			m.Set(x, y, float64(in.GrayAt(x, y).Y))
@@ -38,19 +38,19 @@ func NewMatrixFromGray(in *image.Gray) *Matrix {
 	return m
 }
 
-func (m *Matrix) At(x, y int) float64 {
+func (m *M) At(x, y int) float64 {
 	return m.pixels[y][x]
 }
 
-func (m *Matrix) Set(x, y int, value float64) {
+func (m *M) Set(x, y int, value float64) {
 	m.pixels[y][x] = value
 }
 
-func (m *Matrix) Bounds() image.Rectangle {
+func (m *M) Bounds() image.Rectangle {
 	return m.bounds
 }
 
-func (m *Matrix) SubImage(r image.Rectangle) *Matrix {
+func (m *M) SubImage(r image.Rectangle) *M {
 	r = r.Intersect(m.bounds)
 
 	// If r1 and r2 are Rectangles, r1.Intersect(r2) is not guaranteed to be inside
@@ -59,13 +59,13 @@ func (m *Matrix) SubImage(r image.Rectangle) *Matrix {
 	if r.Empty() {
 		panic("wtf")
 	}
-	return &Matrix{
+	return &M{
 		pixels: m.pixels,
 		bounds: r,
 	}
 }
 
-func (m *Matrix) ToGray() *image.Gray {
+func (m *M) ToGray() *image.Gray {
 	bounds := m.Bounds()
 	gray := image.NewGray(bounds)
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {

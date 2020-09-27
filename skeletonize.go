@@ -11,7 +11,7 @@ func init() {
 	}
 }
 
-func Skeletonize(in *matrix.Matrix) {
+func Skeletonize(in *matrix.M) {
 	bounds := in.Bounds()
 
 	changes := true

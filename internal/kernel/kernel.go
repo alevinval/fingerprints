@@ -8,15 +8,15 @@ import (
 )
 
 type Kernel interface {
-	Apply(in *matrix.Matrix, x, y int) float64
+	Apply(in *matrix.M, x, y int) float64
 	Offset() int
 }
 
-type BaseKernel struct {
+type Base struct {
 	kernel Kernel
 }
 
-func (base *BaseKernel) ParallelConvolution(in, out *matrix.Matrix) *sync.WaitGroup {
+func (base *Base) ParallelConvolution(in, out *matrix.M) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	sub := generateSubImageBounds(in)
@@ -36,7 +36,7 @@ func (base *BaseKernel) ParallelConvolution(in, out *matrix.Matrix) *sync.WaitGr
 	return wg
 }
 
-func (base *BaseKernel) Convolution(in, out *matrix.Matrix) {
+func (base *Base) Convolution(in, out *matrix.M) {
 	offset := base.kernel.Offset()
 	bounds := in.Bounds()
 	for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
@@ -47,7 +47,7 @@ func (base *BaseKernel) Convolution(in, out *matrix.Matrix) {
 	}
 }
 
-func (base *BaseKernel) deferredConvolution(in, out *matrix.Matrix) *sync.WaitGroup {
+func (base *Base) deferredConvolution(in, out *matrix.M) *sync.WaitGroup {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
@@ -57,8 +57,8 @@ func (base *BaseKernel) deferredConvolution(in, out *matrix.Matrix) *sync.WaitGr
 	return wg
 }
 
-func generateSubImageBounds(in *matrix.Matrix) <-chan *matrix.Matrix {
-	ch := make(chan *matrix.Matrix)
+func generateSubImageBounds(in *matrix.M) <-chan *matrix.M {
+	ch := make(chan *matrix.M)
 	bounds := in.Bounds()
 	blockSize := bounds.Max.X / 8
 	offset := 6

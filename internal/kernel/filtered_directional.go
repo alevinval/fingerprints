@@ -7,18 +7,18 @@ import (
 )
 
 type filteredDirectional struct {
-	BaseKernel
-	mulGx, mulGy, mulGxy *matrixMulKernel
+	Base
+	mulGx, mulGy, mulGxy *multiplication
 	offset               int
 }
 
-func NewFilteredDirectional(gx, gy *matrix.Matrix, offset int) *filteredDirectional {
+func NewFilteredDirectional(gx, gy *matrix.M, offset int) *filteredDirectional {
 	k := &filteredDirectional{
-		mulGx:  NewKernelMatrixMul(gx, gx, offset),
-		mulGy:  NewKernelMatrixMul(gy, gy, offset),
-		mulGxy: NewKernelMatrixMul(gx, gy, offset),
+		mulGx:  NewMultiplication(gx, gx, offset),
+		mulGy:  NewMultiplication(gy, gy, offset),
+		mulGxy: NewMultiplication(gx, gy, offset),
 		offset: offset}
-	k.BaseKernel = BaseKernel{kernel: k}
+	k.Base = Base{kernel: k}
 	return k
 }
 
@@ -26,7 +26,7 @@ func (k *filteredDirectional) Offset() int {
 	return k.offset
 }
 
-func (k *filteredDirectional) Apply(_ *matrix.Matrix, x, y int) float64 {
+func (k *filteredDirectional) Apply(_ *matrix.M, x, y int) float64 {
 	gxx := k.mulGx.Apply(nil, x, y)
 	gyy := k.mulGy.Apply(nil, x, y)
 	gxy := k.mulGxy.Apply(nil, x, y)

@@ -6,7 +6,7 @@ import (
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
-func Normalize(in, out *matrix.Matrix) {
+func Normalize(in, out *matrix.M) {
 	var min, max float64
 	min = math.MaxFloat64
 

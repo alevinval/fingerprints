@@ -6,23 +6,23 @@ import (
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
-type varianceKernel struct {
-	BaseKernel
-	phy    *matrix.Matrix
+type variance struct {
+	Base
+	phy    *matrix.M
 	offset int
 }
 
-func NewVarianceKernel(directional *matrix.Matrix) *varianceKernel {
-	k := &varianceKernel{phy: directional, offset: 8}
-	k.BaseKernel = BaseKernel{kernel: k}
+func NewVariance(directional *matrix.M) *variance {
+	k := &variance{phy: directional, offset: 8}
+	k.Base = Base{kernel: k}
 	return k
 }
 
-func (k *varianceKernel) Offset() int {
+func (k *variance) Offset() int {
 	return k.offset
 }
 
-func (k *varianceKernel) Apply(in *matrix.Matrix, x, y int) float64 {
+func (k *variance) Apply(in *matrix.M, x, y int) float64 {
 	var pos int
 
 	sigSize := float64(k.Offset()*2 + 1)

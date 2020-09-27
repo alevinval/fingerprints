@@ -7,14 +7,14 @@ import (
 )
 
 type Sqrt struct {
-	BaseKernel
-	a *matrix.Matrix
-	b *matrix.Matrix
+	Base
+	a *matrix.M
+	b *matrix.M
 }
 
-func NewSqrtKernel(a, b *matrix.Matrix) *Sqrt {
+func NewSqrt(a, b *matrix.M) *Sqrt {
 	k := &Sqrt{a: a, b: b}
-	k.BaseKernel = BaseKernel{kernel: k}
+	k.Base = Base{kernel: k}
 	return k
 }
 
@@ -22,7 +22,7 @@ func (k *Sqrt) Offset() int {
 	return 0
 }
 
-func (k *Sqrt) Apply(_ *matrix.Matrix, x, y int) float64 {
+func (k *Sqrt) Apply(_ *matrix.M, x, y int) float64 {
 	aa := k.a.At(x, y)
 	bb := k.b.At(x, y)
 	return math.Sqrt(aa*aa + bb*bb)

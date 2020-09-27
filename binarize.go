@@ -9,7 +9,7 @@ import (
 const BLACK = 0
 const WHITE = 255
 
-func Binarize(in, out *matrix.Matrix) {
+func Binarize(in, out *matrix.M) {
 	var sum float64
 
 	bounds := in.Bounds()
@@ -32,9 +32,9 @@ func Binarize(in, out *matrix.Matrix) {
 	}
 }
 
-func BinarizeEnhancement(in *matrix.Matrix) *matrix.Matrix {
+func BinarizeEnhancement(in *matrix.M) *matrix.M {
 	bounds := in.Bounds()
-	p := matrix.NewMatrixFromGray(in.ToGray())
+	p := matrix.NewFromGray(in.ToGray())
 
 	region := 1
 	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
@@ -73,7 +73,7 @@ func BinarizeEnhancement(in *matrix.Matrix) *matrix.Matrix {
 	return p
 }
 
-func fillRegion(p *matrix.Matrix, region, x, y, max int) {
+func fillRegion(p *matrix.M, region, x, y, max int) {
 	if x == p.Bounds().Min.X+1 || x == p.Bounds().Max.X-1 {
 		return
 	}
@@ -108,7 +108,7 @@ func fillRegion(p *matrix.Matrix, region, x, y, max int) {
 	}
 }
 
-func eraseRegion(p, in *matrix.Matrix, region int) {
+func eraseRegion(p, in *matrix.M, region int) {
 	bounds := p.Bounds()
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
