@@ -7,6 +7,7 @@ import (
 	"image/png"
 	_ "image/png"
 	"os"
+	"path"
 	_ "time"
 
 	"github.com/alevinval/fingerprints/internal/kernel"
@@ -15,6 +16,8 @@ import (
 	"github.com/nfnt/resize"
 	_ "github.com/nfnt/resize"
 )
+
+var outFolder = "out"
 
 func loadImage(name string) *image.Gray {
 	f, err := os.Open(name)
@@ -47,7 +50,7 @@ func loadImage(name string) *image.Gray {
 var posX, posY = 0, 0
 
 func showImage(title string, in *matrix.M) {
-	f, err := os.Create("out2/" + title + ".png")
+	f, err := os.Create(path.Join(outFolder, title+".png"))
 	if err != nil {
 		panic(err)
 	}
