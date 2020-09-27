@@ -5,16 +5,13 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	"image/png"
-	_ "image/png"
 	"os"
 	"path"
-	_ "time"
 
 	"github.com/alevinval/fingerprints/internal/kernel"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/processing"
 	"github.com/nfnt/resize"
-	_ "github.com/nfnt/resize"
 )
 
 var outFolder = "out"
