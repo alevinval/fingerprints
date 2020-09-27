@@ -1,5 +1,7 @@
 package main
 
+import "github.com/alevinval/fingerprints/internal/matrix"
+
 var conditions []Condition
 
 func init() {
@@ -9,7 +11,7 @@ func init() {
 	}
 }
 
-func Skeletonize(in *Matrix) {
+func Skeletonize(in *matrix.Matrix) {
 	bounds := in.Bounds()
 
 	changes := true

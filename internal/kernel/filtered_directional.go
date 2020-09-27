@@ -1,7 +1,9 @@
-package main
+package kernel
 
 import (
 	"math"
+
+	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
 type filteredDirectional struct {
@@ -10,7 +12,7 @@ type filteredDirectional struct {
 	offset               int
 }
 
-func NewFilteredDirectional(gx, gy *Matrix, offset int) *filteredDirectional {
+func NewFilteredDirectional(gx, gy *matrix.Matrix, offset int) *filteredDirectional {
 	k := &filteredDirectional{
 		mulGx:  NewKernelMatrixMul(gx, gx, offset),
 		mulGy:  NewKernelMatrixMul(gy, gy, offset),
@@ -24,7 +26,7 @@ func (k *filteredDirectional) Offset() int {
 	return k.offset
 }
 
-func (k *filteredDirectional) Apply(_ *Matrix, x, y int) float64 {
+func (k *filteredDirectional) Apply(_ *matrix.Matrix, x, y int) float64 {
 	gxx := k.mulGx.Apply(nil, x, y)
 	gyy := k.mulGy.Apply(nil, x, y)
 	gxy := k.mulGxy.Apply(nil, x, y)

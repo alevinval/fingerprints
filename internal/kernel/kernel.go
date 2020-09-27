@@ -1,12 +1,14 @@
-package main
+package kernel
 
 import (
 	"image"
 	"sync"
+
+	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
 type Kernel interface {
-	Apply(in *Matrix, x, y int) float64
+	Apply(in *matrix.Matrix, x, y int) float64
 	Offset() int
 }
 
@@ -14,7 +16,7 @@ type BaseKernel struct {
 	kernel Kernel
 }
 
-func (base *BaseKernel) ParallelConvolution(in, out *Matrix) *sync.WaitGroup {
+func (base *BaseKernel) ParallelConvolution(in, out *matrix.Matrix) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	sub := generateSubImageBounds(in)
@@ -34,7 +36,7 @@ func (base *BaseKernel) ParallelConvolution(in, out *Matrix) *sync.WaitGroup {
 	return wg
 }
 
-func (base *BaseKernel) Convolution(in, out *Matrix) {
+func (base *BaseKernel) Convolution(in, out *matrix.Matrix) {
 	offset := base.kernel.Offset()
 	bounds := in.Bounds()
 	for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
@@ -45,7 +47,7 @@ func (base *BaseKernel) Convolution(in, out *Matrix) {
 	}
 }
 
-func (base *BaseKernel) deferredConvolution(in, out *Matrix) *sync.WaitGroup {
+func (base *BaseKernel) deferredConvolution(in, out *matrix.Matrix) *sync.WaitGroup {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
@@ -55,8 +57,8 @@ func (base *BaseKernel) deferredConvolution(in, out *Matrix) *sync.WaitGroup {
 	return wg
 }
 
-func generateSubImageBounds(in *Matrix) <-chan *Matrix {
-	ch := make(chan *Matrix)
+func generateSubImageBounds(in *matrix.Matrix) <-chan *matrix.Matrix {
+	ch := make(chan *matrix.Matrix)
 	bounds := in.Bounds()
 	blockSize := bounds.Max.X / 8
 	offset := 6

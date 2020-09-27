@@ -9,6 +9,8 @@ import (
 	"os"
 	_ "time"
 
+	"github.com/alevinval/fingerprints/internal/kernel"
+	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/nfnt/resize"
 	_ "github.com/nfnt/resize"
 )
@@ -43,7 +45,7 @@ func loadImage(name string) *image.Gray {
 
 var posX, posY = 0, 0
 
-func showImage(title string, in *Matrix) {
+func showImage(title string, in *matrix.Matrix) {
 	f, err := os.Create("out2/" + title + ".png")
 	if err != nil {
 		panic(err)
@@ -54,53 +56,53 @@ func showImage(title string, in *Matrix) {
 	png.Encode(f, img)
 }
 
-func processImage(in *Matrix) {
+func processImage(in *matrix.Matrix) {
 	bounds := in.Bounds()
-	normalized := NewMatrix(bounds)
+	normalized := matrix.NewMatrix(bounds)
 
 	Normalize(in, normalized)
 	showImage("Normalized", normalized)
 
-	gx, gy := NewMatrix(bounds), NewMatrix(bounds)
-	c1 := SobelDx.ParallelConvolution(normalized, gx)
-	c2 := SobelDy.ParallelConvolution(normalized, gy)
+	gx, gy := matrix.NewMatrix(bounds), matrix.NewMatrix(bounds)
+	c1 := kernel.SobelDx.ParallelConvolution(normalized, gx)
+	c2 := kernel.SobelDy.ParallelConvolution(normalized, gy)
 	c1.Wait()
 	c2.Wait()
 
 	//Consistency matrix
-	consistency, normConsistency := NewMatrix(bounds), NewMatrix(bounds)
-	c1 = NewSqrtKernel(gx, gy).ParallelConvolution(in, consistency)
+	consistency, normConsistency := matrix.NewMatrix(bounds), matrix.NewMatrix(bounds)
+	c1 = kernel.NewSqrtKernel(gx, gy).ParallelConvolution(in, consistency)
 	c1.Wait()
 	Normalize(consistency, normConsistency)
 	showImage("Normalized Consistency", normConsistency)
 
 	// Compute directional
-	directional, normDirectional := NewMatrix(bounds), NewMatrix(bounds)
-	c1 = NewDirectionalKernel(gx, gy).ParallelConvolution(directional, directional)
+	directional, normDirectional := matrix.NewMatrix(bounds), matrix.NewMatrix(bounds)
+	c1 = kernel.NewDirectionalKernel(gx, gy).ParallelConvolution(directional, directional)
 	c1.Wait()
 	Normalize(directional, normDirectional)
 	showImage("Directional", normDirectional)
 
 	// Compute filtered directional
-	filteredD, normFilteredD := NewMatrix(bounds), NewMatrix(bounds)
-	c1 = NewFilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
+	filteredD, normFilteredD := matrix.NewMatrix(bounds), matrix.NewMatrix(bounds)
+	c1 = kernel.NewFilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
 	c1.Wait()
 	Normalize(filteredD, normFilteredD)
 	showImage("Filtered Directional", normFilteredD)
 
 	// Compute segmented image
-	segmented, normSegmented := NewMatrix(bounds), NewMatrix(bounds)
-	NewVarianceKernel(filteredD).Convolution(normalized, segmented)
+	segmented, normSegmented := matrix.NewMatrix(bounds), matrix.NewMatrix(bounds)
+	kernel.NewVarianceKernel(filteredD).Convolution(normalized, segmented)
 	Normalize(segmented, normSegmented)
 	showImage("Filtered Directional Std Dev.", normSegmented)
 
 	// Compute binarized segmented image
-	binarizedSegmented := NewMatrix(bounds)
+	binarizedSegmented := matrix.NewMatrix(bounds)
 	Binarize(normSegmented, binarizedSegmented)
 	showImage("Binarized Segmented", binarizedSegmented)
 
 	// Binarize normalized image
-	binarizedNorm := NewMatrix(bounds)
+	binarizedNorm := matrix.NewMatrix(bounds)
 	Binarize(normalized, binarizedNorm)
 	showImage("Binarized Normalized", binarizedNorm)
 
@@ -114,6 +116,6 @@ func processImage(in *Matrix) {
 
 func main() {
 	original := loadImage("corpus/nist2.jpg")
-	img := NewMatrixFromGray(original)
+	img := matrix.NewMatrixFromGray(original)
 	processImage(img)
 }

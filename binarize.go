@@ -1,11 +1,15 @@
 package main
 
-import "math"
+import (
+	"math"
+
+	"github.com/alevinval/fingerprints/internal/matrix"
+)
 
 const BLACK = 0
 const WHITE = 255
 
-func Binarize(in, out *Matrix) {
+func Binarize(in, out *matrix.Matrix) {
 	var sum float64
 
 	bounds := in.Bounds()
@@ -28,9 +32,9 @@ func Binarize(in, out *Matrix) {
 	}
 }
 
-func BinarizeEnhancement(in *Matrix) *Matrix {
+func BinarizeEnhancement(in *matrix.Matrix) *matrix.Matrix {
 	bounds := in.Bounds()
-	p := NewMatrixFromGray(in.ToGray())
+	p := matrix.NewMatrixFromGray(in.ToGray())
 
 	region := 1
 	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
@@ -69,11 +73,11 @@ func BinarizeEnhancement(in *Matrix) *Matrix {
 	return p
 }
 
-func fillRegion(p *Matrix, region, x, y, max int) {
-	if x == p.bounds.Min.X+1 || x == p.bounds.Max.X-1 {
+func fillRegion(p *matrix.Matrix, region, x, y, max int) {
+	if x == p.Bounds().Min.X+1 || x == p.Bounds().Max.X-1 {
 		return
 	}
-	if y == p.bounds.Min.Y+1 || y == p.bounds.Max.Y-1 {
+	if y == p.Bounds().Min.Y+1 || y == p.Bounds().Max.Y-1 {
 		return
 	}
 	bw := p.At(x, y)
@@ -104,7 +108,7 @@ func fillRegion(p *Matrix, region, x, y, max int) {
 	}
 }
 
-func eraseRegion(p, in *Matrix, region int) {
+func eraseRegion(p, in *matrix.Matrix, region int) {
 	bounds := p.Bounds()
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {

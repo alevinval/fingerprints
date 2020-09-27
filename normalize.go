@@ -1,8 +1,12 @@
 package main
 
-import "math"
+import (
+	"math"
 
-func Normalize(in, out *Matrix) {
+	"github.com/alevinval/fingerprints/internal/matrix"
+)
+
+func Normalize(in, out *matrix.Matrix) {
 	var min, max float64
 	min = math.MaxFloat64
 
