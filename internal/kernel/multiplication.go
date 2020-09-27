@@ -8,7 +8,7 @@ type multiplication struct {
 	offset int
 }
 
-func NewMultiplication(a, b *matrix.M, offset int) *multiplication {
+func Multiplication(a, b *matrix.M, offset int) *multiplication {
 	k := &multiplication{a: a, b: b, offset: offset}
 	k.Base = Base{kernel: k}
 	return k

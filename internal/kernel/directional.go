@@ -11,7 +11,7 @@ type directional struct {
 	gx, gy *matrix.M
 }
 
-func NewDirectional(gx, gy *matrix.M) *directional {
+func Directional(gx, gy *matrix.M) *directional {
 	k := &directional{gx: gx, gy: gy}
 	k.Base = Base{kernel: k}
 	return k

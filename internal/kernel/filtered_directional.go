@@ -14,9 +14,9 @@ type filteredDirectional struct {
 
 func FilteredDirectional(gx, gy *matrix.M, offset int) *filteredDirectional {
 	k := &filteredDirectional{
-		mulGx:  NewMultiplication(gx, gx, offset),
-		mulGy:  NewMultiplication(gy, gy, offset),
-		mulGxy: NewMultiplication(gx, gy, offset),
+		mulGx:  Multiplication(gx, gx, offset),
+		mulGy:  Multiplication(gy, gy, offset),
+		mulGxy: Multiplication(gx, gy, offset),
 		offset: offset}
 	k.Base = Base{kernel: k}
 	return k

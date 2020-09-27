@@ -72,14 +72,14 @@ func processImage(in *matrix.M) {
 
 	//Consistency matrix
 	consistency, normConsistency := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.NewSqrt(gx, gy).ParallelConvolution(in, consistency)
+	c1 = kernel.Sqrt(gx, gy).ParallelConvolution(in, consistency)
 	c1.Wait()
 	processing.Normalize(consistency, normConsistency)
 	showImage("Normalized Consistency", normConsistency)
 
 	// Compute directional
 	directional, normDirectional := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.NewDirectional(gx, gy).ParallelConvolution(directional, directional)
+	c1 = kernel.Directional(gx, gy).ParallelConvolution(directional, directional)
 	c1.Wait()
 	processing.Normalize(directional, normDirectional)
 	showImage("Directional", normDirectional)
