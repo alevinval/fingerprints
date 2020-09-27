@@ -61,7 +61,7 @@ func processImage(in *matrix.M) {
 	bounds := in.Bounds()
 	normalized := matrix.New(bounds)
 
-	Normalize(in, normalized)
+	processing.Normalize(in, normalized)
 	showImage("Normalized", normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
@@ -74,27 +74,27 @@ func processImage(in *matrix.M) {
 	consistency, normConsistency := matrix.New(bounds), matrix.New(bounds)
 	c1 = kernel.NewSqrt(gx, gy).ParallelConvolution(in, consistency)
 	c1.Wait()
-	Normalize(consistency, normConsistency)
+	processing.Normalize(consistency, normConsistency)
 	showImage("Normalized Consistency", normConsistency)
 
 	// Compute directional
 	directional, normDirectional := matrix.New(bounds), matrix.New(bounds)
 	c1 = kernel.NewDirectional(gx, gy).ParallelConvolution(directional, directional)
 	c1.Wait()
-	Normalize(directional, normDirectional)
+	processing.Normalize(directional, normDirectional)
 	showImage("Directional", normDirectional)
 
 	// Compute filtered directional
 	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
 	c1 = kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
 	c1.Wait()
-	Normalize(filteredD, normFilteredD)
+	processing.Normalize(filteredD, normFilteredD)
 	showImage("Filtered Directional", normFilteredD)
 
 	// Compute segmented image
 	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
 	kernel.Variance(filteredD).Convolution(normalized, segmented)
-	Normalize(segmented, normSegmented)
+	processing.Normalize(segmented, normSegmented)
 	showImage("Filtered Directional Std Dev.", normSegmented)
 
 	// Compute binarized segmented image
