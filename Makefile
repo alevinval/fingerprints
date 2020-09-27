@@ -1,7 +1,10 @@
-.PHONY: corpus
+.PHONY: corpus clean
 
-corpus:
-	go build ./cmd/fingerprint-corpus
-	rm -rf out
+corpus: clean
 	mkdir out
+	go build ./cmd/fingerprint-corpus
 	./fingerprint-corpus out
+
+clean:
+	rm -rf out
+	rm -f fingerprint-corpus
