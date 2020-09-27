@@ -1,4 +1,4 @@
-package main
+package processing
 
 import "github.com/alevinval/fingerprints/internal/matrix"
 

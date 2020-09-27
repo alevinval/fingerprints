@@ -12,7 +12,7 @@ type variance struct {
 	offset int
 }
 
-func NewVariance(directional *matrix.M) *variance {
+func Variance(directional *matrix.M) *variance {
 	k := &variance{phy: directional, offset: 8}
 	k.Base = Base{kernel: k}
 	return k

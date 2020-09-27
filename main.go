@@ -11,6 +11,7 @@ import (
 
 	"github.com/alevinval/fingerprints/internal/kernel"
 	"github.com/alevinval/fingerprints/internal/matrix"
+	"github.com/alevinval/fingerprints/internal/processing"
 	"github.com/nfnt/resize"
 	_ "github.com/nfnt/resize"
 )
@@ -71,7 +72,7 @@ func processImage(in *matrix.M) {
 
 	//Consistency matrix
 	consistency, normConsistency := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.NewSqrtKernel(gx, gy).ParallelConvolution(in, consistency)
+	c1 = kernel.NewSqrt(gx, gy).ParallelConvolution(in, consistency)
 	c1.Wait()
 	Normalize(consistency, normConsistency)
 	showImage("Normalized Consistency", normConsistency)
@@ -85,32 +86,32 @@ func processImage(in *matrix.M) {
 
 	// Compute filtered directional
 	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.NewFilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
+	c1 = kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
 	c1.Wait()
 	Normalize(filteredD, normFilteredD)
 	showImage("Filtered Directional", normFilteredD)
 
 	// Compute segmented image
 	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
-	kernel.NewVarianceKernel(filteredD).Convolution(normalized, segmented)
+	kernel.Variance(filteredD).Convolution(normalized, segmented)
 	Normalize(segmented, normSegmented)
 	showImage("Filtered Directional Std Dev.", normSegmented)
 
 	// Compute binarized segmented image
 	binarizedSegmented := matrix.New(bounds)
-	Binarize(normSegmented, binarizedSegmented)
+	processing.Binarize(normSegmented, binarizedSegmented)
 	showImage("Binarized Segmented", binarizedSegmented)
 
 	// Binarize normalized image
 	binarizedNorm := matrix.New(bounds)
-	Binarize(normalized, binarizedNorm)
+	processing.Binarize(normalized, binarizedNorm)
 	showImage("Binarized Normalized", binarizedNorm)
 
-	BinarizeEnhancement(binarizedNorm)
+	processing.BinarizeEnhancement(binarizedNorm)
 	showImage("Binarized Enhanced", binarizedNorm)
 
 	// Skeletonize
-	Skeletonize(binarizedNorm)
+	processing.Skeletonize(binarizedNorm)
 	showImage("Skeletonized", binarizedNorm)
 }
 
