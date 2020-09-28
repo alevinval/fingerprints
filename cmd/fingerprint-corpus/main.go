@@ -17,6 +17,26 @@ import (
 
 var outFolder = "out"
 
+func resizeImage(img image.Image) image.Image {
+	maxDimension := 300
+	dx := img.Bounds().Dx()
+	dy := img.Bounds().Dy()
+
+	xp := 0
+	yp := 0
+	if dx > dy {
+		xp = maxDimension
+		yp = int(float64(dy) / (float64(dx) / float64(maxDimension)))
+	} else if dy > dx {
+		yp = maxDimension
+		xp = int(float64(dx) / (float64(dy) / float64(maxDimension)))
+	} else {
+		xp, yp = maxDimension, maxDimension
+	}
+	log.Printf("resizing image from (%d,%d) to (%d,%d)", dx, dy, xp, yp)
+	return resize.Resize(uint(xp), uint(yp), img, resize.Bilinear)
+}
+
 func loadImage(name string) *image.Gray {
 	f, err := os.Open(name)
 	if err != nil {
@@ -24,19 +44,19 @@ func loadImage(name string) *image.Gray {
 	}
 	defer f.Close()
 
-	m, _, err := image.Decode(f)
+	img, _, err := image.Decode(f)
 	if err != nil {
 		panic(err)
 	}
 
-	m = resize.Resize(400, 400, m, resize.Bilinear)
+	resizedImg := resizeImage(img)
 
-	bounds := m.Bounds()
+	bounds := resizedImg.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
 	gray := image.NewGray(bounds)
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			oldColor := m.At(x, y)
+			oldColor := resizedImg.At(x, y)
 			grayColor := color.GrayModel.Convert(oldColor)
 			gray.Set(x, y, grayColor)
 		}

@@ -3,6 +3,7 @@ package matrix
 import (
 	"image"
 	"image/color"
+	"log"
 )
 
 type M struct {
@@ -12,11 +13,8 @@ type M struct {
 
 func New(bounds image.Rectangle) *M {
 	dx, dy := bounds.Dx(), bounds.Dy()
-	if dx != dy {
-		panic("only squared images are supported for the moment")
-	}
-	picture := make([][]float64, dx)
-	pixels := make([]float64, dx*dx)
+	picture := make([][]float64, dy)
+	pixels := make([]float64, dx*dy)
 	for i := range picture {
 		picture[i], pixels = pixels[:dx], pixels[dx:]
 	}
@@ -57,7 +55,7 @@ func (m *M) SubImage(r image.Rectangle) *M {
 	// either r1 or r2 if the intersection is empty. Without explicitly checking for
 	// this, the Pix[i:] expression below can panic.
 	if r.Empty() {
-		panic("wtf")
+		log.Fatal("empty intersection of bounds")
 	}
 	return &M{
 		pixels: m.pixels,
