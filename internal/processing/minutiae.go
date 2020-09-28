@@ -54,10 +54,17 @@ func matchMinutiaeType(in *matrix.M, x, y int) MinutiaeType {
 	pc := in.At(x, y) > 0
 
 	// log.Printf("\n%t, %t, %t\n%t, %t, %t\n%t, %t, %t\n", p0, p1, p2, p7, pc, p3, p6, p5, p4)
-	isBifurcation := pc && ((p6 && p1 && p3 && !p0 && !p2 && !p4 && !p5 && !p7) ||
-		(p0 && p3 && p5 && !p1 && !p2 && !p4 && !p6 && !p7) ||
-		(p4 && p1 && p7 && !p0 && !p2 && !p3 && !p5 && !p6) ||
-		(p2 && p7 && p5 && !p0 && !p1 && !p3 && !p4 && !p6))
+	isBifurcation := pc &&
+		// Diagonals
+		((p6 && p1 && p3 && !p0 && !p2 && !p4 && !p5 && !p7) ||
+			(p0 && p3 && p5 && !p1 && !p2 && !p4 && !p6 && !p7) ||
+			(p4 && p1 && p7 && !p0 && !p2 && !p3 && !p5 && !p6) ||
+			(p2 && p7 && p5 && !p0 && !p1 && !p3 && !p4 && !p6) ||
+			// Perpendiculars
+			(p1 && p6 && p4 && !p0 && !p2 && !p3 && !p5 && !p7) ||
+			(p3 && p0 && p6 && !p1 && !p2 && !p4 && !p5 && !p7) ||
+			(p5 && p0 && p2 && !p1 && !p3 && !p4 && !p6 && !p7) ||
+			(p6 && p2 && p4 && !p0 && !p1 && !p3 && !p5 && !p7))
 
 	isTermination := pc && ((p0 && !p1 && !p2 && !p3 && !p4 && !p5 && !p6 && !p7) ||
 		(p1 && !p0 && !p2 && !p3 && !p4 && !p5 && !p6 && !p7) ||

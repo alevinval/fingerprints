@@ -23,7 +23,7 @@ func Binarize(in, out *matrix.M) {
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			pixel := in.At(x, y)
-			if float64(pixel) < mean/math.Pi {
+			if float64(pixel) < mean/2 {
 				out.Set(x, y, BLACK)
 			} else {
 				out.Set(x, y, WHITE)

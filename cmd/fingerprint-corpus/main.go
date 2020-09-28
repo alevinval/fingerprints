@@ -69,18 +69,6 @@ func processImage(in *matrix.M) {
 	kernel.SobelDx.ParallelConvolution(normalized, gx)
 	kernel.SobelDy.ParallelConvolution(normalized, gy)
 
-	//Consistency matrix
-	consistency, normConsistency := matrix.New(bounds), matrix.New(bounds)
-	kernel.Sqrt(gx, gy).ParallelConvolution(in, consistency)
-	processing.Normalize(consistency, normConsistency)
-	showImage("Normalized Consistency", normConsistency)
-
-	// Compute directional
-	directional, normDirectional := matrix.New(bounds), matrix.New(bounds)
-	kernel.Directional(gx, gy).ParallelConvolution(directional, directional)
-	processing.Normalize(directional, normDirectional)
-	showImage("Directional", normDirectional)
-
 	// Compute filtered directional
 	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
 	kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
@@ -96,21 +84,17 @@ func processImage(in *matrix.M) {
 	// Compute binarized segmented image
 	binarizedSegmented := matrix.New(bounds)
 	processing.Binarize(normSegmented, binarizedSegmented)
+	processing.BinarizeEnhancement(binarizedSegmented)
 	showImage("Binarized Segmented", binarizedSegmented)
 
 	// Binarize normalized image
-	binarizedNorm := matrix.New(bounds)
-	processing.Binarize(normalized, binarizedNorm)
-	showImage("Binarized Normalized", binarizedNorm)
+	skeletonized := matrix.New(bounds)
+	processing.Binarize(normalized, skeletonized)
+	processing.BinarizeEnhancement(skeletonized)
+	processing.Skeletonize(skeletonized)
+	showImage("Skeletonized", skeletonized)
 
-	processing.BinarizeEnhancement(binarizedNorm)
-	showImage("Binarized Enhanced", binarizedNorm)
-
-	// Skeletonize
-	processing.Skeletonize(binarizedNorm)
-	showImage("Skeletonized", binarizedNorm)
-
-	minutiaes := processing.ExtractMinutiae(binarizedNorm, filteredD, normSegmented)
+	minutiaes := processing.ExtractMinutiae(skeletonized, filteredD, binarizedSegmented)
 
 	out := matrix.New(bounds)
 	for _, minutiae := range minutiaes {
