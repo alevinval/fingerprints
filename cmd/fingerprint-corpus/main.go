@@ -130,7 +130,7 @@ func processImage(in *matrix.M) {
 }
 
 func main() {
-	original := loadImage("corpus/nist2.jpg")
+	original := loadImage("corpus/nist3.jpg")
 	img := matrix.NewFromGray(original)
 	processImage(img)
 }

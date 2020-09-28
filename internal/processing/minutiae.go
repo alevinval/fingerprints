@@ -52,28 +52,45 @@ func matchMinutiaeType(in *matrix.M, x, y int) MinutiaeType {
 	p6 := in.At(x-1, y+1) > 0
 	p7 := in.At(x-1, y) > 0
 	pc := in.At(x, y) > 0
+	f := func(pc, p0, p1, p2, p3, p4, p5, p6, p7 bool) bool {
+		return pc && p0 && p1 && p2 && p3 && p4 && p5 && p6 && p7
+	}
 
-	// log.Printf("\n%t, %t, %t\n%t, %t, %t\n%t, %t, %t\n", p0, p1, p2, p7, pc, p3, p6, p5, p4)
-	isBifurcation := pc &&
-		// Diagonals
-		((p6 && p1 && p3 && !p0 && !p2 && !p4 && !p5 && !p7) ||
-			(p0 && p3 && p5 && !p1 && !p2 && !p4 && !p6 && !p7) ||
-			(p4 && p1 && p7 && !p0 && !p2 && !p3 && !p5 && !p6) ||
-			(p2 && p7 && p5 && !p0 && !p1 && !p3 && !p4 && !p6) ||
-			// Perpendiculars
-			(p1 && p6 && p4 && !p0 && !p2 && !p3 && !p5 && !p7) ||
-			(p3 && p0 && p6 && !p1 && !p2 && !p4 && !p5 && !p7) ||
-			(p5 && p0 && p2 && !p1 && !p3 && !p4 && !p6 && !p7) ||
-			(p6 && p2 && p4 && !p0 && !p1 && !p3 && !p5 && !p7))
+	/*
+		p0 p1 p2
+		p7 pc p3
+		p6 p5 p4
+	*/
+	isBifurcation := (
+	// Diagonals
+	f(pc, p0, p3, p5, !p1, !p2, !p4, !p6, !p7) ||
+		f(pc, p4, p1, p7, !p0, !p2, !p3, !p5, !p6) ||
+		f(pc, p2, p7, p5, !p0, !p1, !p3, !p4, !p6) ||
+		f(pc, p6, p1, p3, !p0, !p2, !p4, !p5, !p7) ||
+		// Verticals/Horizontals
+		f(pc, p1, p6, p4, !p0, !p2, !p3, !p5, !p7) ||
+		f(pc, p3, p0, p6, !p1, !p2, !p4, !p5, !p7) ||
+		f(pc, p5, p0, p2, !p1, !p3, !p4, !p6, !p7) ||
+		f(pc, p6, p2, p4, !p0, !p1, !p3, !p5, !p7) ||
+		// Perpendiculars clock and counter-clock wise
+		f(pc, p1, p3, p5, !p0, !p2, !p4, !p6, !p7) ||
+		f(pc, p1, p7, p5, !p0, !p2, !p3, !p4, !p6) ||
+		f(pc, p3, p7, p5, !p0, !p1, !p2, !p4, !p6) ||
+		f(pc, p3, p7, p1, !p0, !p2, !p4, !p5, !p6) ||
+		f(pc, p5, p7, p1, !p0, !p2, !p3, !p4, !p6) ||
+		f(pc, p5, p3, p1, !p0, !p2, !p4, !p6, !p7) ||
+		f(pc, p7, p1, p3, !p0, !p2, !p4, !p5, !p6) ||
+		f(pc, p7, p5, p3, !p0, !p2, !p3, !p4, !p6))
 
-	isTermination := pc && ((p0 && !p1 && !p2 && !p3 && !p4 && !p5 && !p6 && !p7) ||
-		(p1 && !p0 && !p2 && !p3 && !p4 && !p5 && !p6 && !p7) ||
-		(p2 && !p0 && !p1 && !p3 && !p4 && !p5 && !p6 && !p7) ||
-		(p3 && !p0 && !p1 && !p2 && !p4 && !p5 && !p6 && !p7) ||
-		(p4 && !p0 && !p1 && !p2 && !p3 && !p5 && !p6 && !p7) ||
-		(p5 && !p0 && !p1 && !p2 && !p3 && !p4 && !p6 && !p7) ||
-		(p6 && !p0 && !p1 && !p2 && !p3 && !p4 && !p5 && !p7) ||
-		(p7 && !p0 && !p1 && !p2 && !p3 && !p4 && !p5 && !p6))
+	isTermination := (f(pc, p0, !p1, !p2, !p3, !p4, !p5, !p6, !p7) ||
+		f(pc, p1, !p0, !p2, !p3, !p4, !p5, !p6, !p7) ||
+		f(pc, p2, !p0, !p1, !p3, !p4, !p5, !p6, !p7) ||
+		f(pc, p3, !p0, !p1, !p2, !p4, !p5, !p6, !p7) ||
+		f(pc, p4, !p0, !p1, !p2, !p3, !p5, !p6, !p7) ||
+		f(pc, p5, !p0, !p1, !p2, !p3, !p4, !p6, !p7) ||
+		f(pc, p6, !p0, !p1, !p2, !p3, !p4, !p5, !p7) ||
+		f(pc, p7, !p0, !p1, !p2, !p3, !p4, !p5, !p6))
+
 	if isBifurcation {
 		return Bifurcation
 	} else if isTermination {

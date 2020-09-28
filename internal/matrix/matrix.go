@@ -50,10 +50,6 @@ func (m *M) Bounds() image.Rectangle {
 
 func (m *M) SubImage(r image.Rectangle) *M {
 	r = r.Intersect(m.bounds)
-
-	// If r1 and r2 are Rectangles, r1.Intersect(r2) is not guaranteed to be inside
-	// either r1 or r2 if the intersection is empty. Without explicitly checking for
-	// this, the Pix[i:] expression below can panic.
 	if r.Empty() {
 		log.Fatal("empty intersection of bounds")
 	}
