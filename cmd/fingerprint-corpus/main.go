@@ -21,6 +21,9 @@ func resizeImage(img image.Image) image.Image {
 	maxDimension := 300
 	dx := img.Bounds().Dx()
 	dy := img.Bounds().Dy()
+	if dx < maxDimension && dy < maxDimension {
+		return img
+	}
 
 	xp := 0
 	yp := 0
