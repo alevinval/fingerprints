@@ -5,6 +5,7 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	"image/png"
+	"log"
 	"os"
 	"path"
 
@@ -108,6 +109,17 @@ func processImage(in *matrix.M) {
 	// Skeletonize
 	processing.Skeletonize(binarizedNorm)
 	showImage("Skeletonized", binarizedNorm)
+
+	minutiaes := processing.ExtractMinutiae(binarizedNorm, filteredD, normSegmented)
+
+	out := matrix.New(bounds)
+	for _, minutiae := range minutiaes {
+		log.Printf("Found minutiae at %d, %d", minutiae.X, minutiae.Y)
+		log.Printf("Type=%v, Angle=%f", minutiae.Type, minutiae.Angle)
+		out.Set(minutiae.X, minutiae.Y, 255.0)
+	}
+
+	showImage("Minutiaes", out)
 }
 
 func main() {
