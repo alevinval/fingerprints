@@ -65,29 +65,24 @@ func processImage(in *matrix.M) {
 	showImage("Normalized", normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
-	c1 := kernel.SobelDx.ParallelConvolution(normalized, gx)
-	c2 := kernel.SobelDy.ParallelConvolution(normalized, gy)
-	c1.Wait()
-	c2.Wait()
+	kernel.SobelDx.ParallelConvolution(normalized, gx)
+	kernel.SobelDy.ParallelConvolution(normalized, gy)
 
 	//Consistency matrix
 	consistency, normConsistency := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.Sqrt(gx, gy).ParallelConvolution(in, consistency)
-	c1.Wait()
+	kernel.Sqrt(gx, gy).ParallelConvolution(in, consistency)
 	processing.Normalize(consistency, normConsistency)
 	showImage("Normalized Consistency", normConsistency)
 
 	// Compute directional
 	directional, normDirectional := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.Directional(gx, gy).ParallelConvolution(directional, directional)
-	c1.Wait()
+	kernel.Directional(gx, gy).ParallelConvolution(directional, directional)
 	processing.Normalize(directional, normDirectional)
 	showImage("Directional", normDirectional)
 
 	// Compute filtered directional
 	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
-	c1 = kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
-	c1.Wait()
+	kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
 	processing.Normalize(filteredD, normFilteredD)
 	showImage("Filtered Directional", normFilteredD)
 

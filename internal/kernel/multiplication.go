@@ -1,6 +1,8 @@
 package kernel
 
-import "github.com/alevinval/fingerprints/internal/matrix"
+import (
+	"github.com/alevinval/fingerprints/internal/matrix"
+)
 
 type multiplication struct {
 	Base
