@@ -68,8 +68,8 @@ func (m *M) SubImage(r image.Rectangle) *M {
 func (m *M) ToGray() *image.Gray {
 	bounds := m.Bounds()
 	gray := image.NewGray(bounds)
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			gray.SetGray(x, y, color.Gray{Y: uint8(m.At(x, y))})
 		}
 	}

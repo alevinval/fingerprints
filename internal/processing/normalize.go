@@ -11,8 +11,8 @@ func Normalize(in, out *matrix.M) {
 	min = math.MaxFloat64
 
 	bounds := in.Bounds()
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			val := in.At(x, y)
 			if val > max {
 				max = val
@@ -22,8 +22,8 @@ func Normalize(in, out *matrix.M) {
 			}
 		}
 	}
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			pixel := in.At(x, y)
 			normalizedPixel := math.MaxUint8 * (pixel - min) / (max - min)
 			out.Set(x, y, normalizedPixel)

@@ -13,15 +13,15 @@ func Binarize(in, out *matrix.M) {
 	var sum float64
 
 	bounds := in.Bounds()
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			sum += in.At(x, y)
 		}
 	}
 
 	mean := sum / float64(bounds.Dx()*bounds.Dy())
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			pixel := in.At(x, y)
 			if float64(pixel) < mean/math.Pi {
 				out.Set(x, y, BLACK)
@@ -37,8 +37,8 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 	p := matrix.NewFromGray(in.ToGray())
 
 	region := 1
-	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
-		for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
 			if p.At(x, y) == BLACK || p.At(x, y) == WHITE {
 				fillRegion(p, region, x, y, 0)
 				region++
@@ -51,8 +51,8 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 	println("Found ", region, " regions")
 	println("Building histogram")
 	histogram := make([]int, region)
-	for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
-		for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
+		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
 			histogram[int(p.At(x, y))] += 1
 		}
 	}

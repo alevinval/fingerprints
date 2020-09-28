@@ -38,8 +38,8 @@ func (base *Base) ParallelConvolution(in, out *matrix.M) {
 func (base *Base) Convolution(in, out *matrix.M) {
 	offset := base.kernel.Offset()
 	bounds := in.Bounds()
-	for x := bounds.Min.X + offset; x < bounds.Max.X-offset; x++ {
-		for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
+	for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
+		for x := bounds.Min.X + offset; x < bounds.Max.X-offset; x++ {
 			pixel := base.kernel.Apply(in, x, y)
 			out.Set(x, y, pixel)
 		}
