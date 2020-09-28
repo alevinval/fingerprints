@@ -25,6 +25,9 @@ func TestExtractMinutiae(t *testing.T) {
 	assert.NotEmpty(t, minutiaes)
 	first := minutiaes[0]
 	assert.Equal(t, Bifurcation, first.Type)
+	assert.Equal(t, 1.0, first.Angle)
+	assert.Equal(t, 1, first.X)
+	assert.Equal(t, 1, first.Y)
 }
 
 func setMatrixTo(m *matrix.M, value float64) {
