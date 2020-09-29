@@ -1,7 +1,7 @@
 out/
 /fingerprint-corpus
 /fingerprint-corpus.exe
-/extract-features
-/extract-features.exe
-/compare-features
-/compare-features.exe
+/fingerprint-extract
+/fingerprint-extract.exe
+/fingerprint-compare
+/fingerprint-compare.exe
