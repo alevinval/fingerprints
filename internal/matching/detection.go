@@ -34,10 +34,9 @@ func Detection(in *matrix.M) *types.DetectionResult {
 	processing.Skeletonize(skeletonized)
 
 	minutia := processing.ExtractMinutia(skeletonized, filteredD, binarizedSegmented)
-	x, y := processing.ExtractOrigin(binarizedSegmented)
+	frame := processing.ExtractFrame(binarizedSegmented)
 	dr := &types.DetectionResult{
-		X:       x,
-		Y:       y,
+		Frame:   frame,
 		Minutia: minutia,
 	}
 	return dr

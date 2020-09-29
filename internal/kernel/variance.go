@@ -13,7 +13,7 @@ type variance struct {
 }
 
 func Variance(directional *matrix.M) *variance {
-	k := &variance{phy: directional, offset: 5}
+	k := &variance{phy: directional, offset: 8}
 	k.Base = Base{kernel: k}
 	return k
 }
@@ -36,7 +36,7 @@ func (k *variance) Apply(in *matrix.M, x, y int) float64 {
 			if xp >= 0 && xp < in.Bounds().Dx() && yp >= 0 && yp < in.Bounds().Dy() {
 				signature[pos] += in.At(xp, yp)
 			} else {
-				signature[pos] += 0
+				signature[pos] += in.At(x, y)
 			}
 		}
 		pos++
