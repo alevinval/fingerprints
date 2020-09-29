@@ -1,4 +1,4 @@
-package matching
+package types
 
 type (
 	MinutiaeType byte

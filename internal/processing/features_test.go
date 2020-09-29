@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
+	"github.com/alevinval/fingerprints/internal/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +25,7 @@ func TestExtractFeatures(t *testing.T) {
 	minutiaes := ExtractFeatures(skeleton, filteredDirectional, segmented)
 	assert.NotEmpty(t, minutiaes)
 	first := minutiaes[0]
-	assert.Equal(t, matching.Bifurcation, first.Type)
+	assert.Equal(t, types.Bifurcation, first.Type)
 	assert.Equal(t, 1.0, first.Angle)
 	assert.Equal(t, 1, first.X)
 	assert.Equal(t, 1, first.Y)

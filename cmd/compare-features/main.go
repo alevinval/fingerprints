@@ -6,12 +6,13 @@ import (
 	"os"
 
 	"github.com/alevinval/fingerprints/internal/matching"
+	"github.com/alevinval/fingerprints/internal/types"
 )
 
 func main() {
 	a, b := os.Args[1], os.Args[2]
 
-	var l1, l2 matching.MinutiaeList
+	var l1, l2 types.MinutiaeList
 	json.Unmarshal([]byte(a), &l1)
 	json.Unmarshal([]byte(b), &l2)
 	max := len(l1)
