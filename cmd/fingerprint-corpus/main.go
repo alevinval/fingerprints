@@ -62,7 +62,7 @@ func processImage(in *matrix.M) {
 	processing.Skeletonize(skeletonized)
 	showImage("Skeletonized", skeletonized)
 
-	minutiaes := processing.ExtractMinutiae(skeletonized, filteredD, binarizedSegmented)
+	minutiaes := processing.ExtractFeatures(skeletonized, filteredD, binarizedSegmented)
 
 	out := matrix.New(bounds)
 	for _, minutiae := range minutiaes {

@@ -4,11 +4,12 @@ import (
 	"image"
 	"testing"
 
+	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExtractMinutiae(t *testing.T) {
+func TestExtractFeatures(t *testing.T) {
 	filteredDirectional := matrix.New(image.Rect(0, 0, 3, 3))
 	setMatrixTo(filteredDirectional, 1.0)
 	segmented := matrix.New(image.Rect(0, 0, 3, 3))
@@ -21,10 +22,10 @@ func TestExtractMinutiae(t *testing.T) {
 	skeleton.Set(1, 2, 1.0)
 	skeleton.Set(2, 1, 1.0)
 
-	minutiaes := ExtractMinutiae(skeleton, filteredDirectional, segmented)
+	minutiaes := ExtractFeatures(skeleton, filteredDirectional, segmented)
 	assert.NotEmpty(t, minutiaes)
 	first := minutiaes[0]
-	assert.Equal(t, Bifurcation, first.Type)
+	assert.Equal(t, matching.Bifurcation, first.Type)
 	assert.Equal(t, 1.0, first.Angle)
 	assert.Equal(t, 1, first.X)
 	assert.Equal(t, 1, first.Y)

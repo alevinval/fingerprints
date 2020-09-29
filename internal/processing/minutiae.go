@@ -1,26 +1,12 @@
 package processing
 
 import (
+	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
-type MinutiaeType byte
-
-const (
-	Termination MinutiaeType = iota
-	Bifurcation
-	Unknown
-)
-
-type Minutiae struct {
-	X     int
-	Y     int
-	Angle float64
-	Type  MinutiaeType
-}
-
-func ExtractMinutiae(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) []Minutiae {
-	minutiaes := []Minutiae{}
+func ExtractFeatures(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) []matching.Minutiae {
+	minutiaes := []matching.Minutiae{}
 	bounds := skeleton.Bounds()
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
@@ -28,8 +14,8 @@ func ExtractMinutiae(skeleton *matrix.M, filteredDirectional *matrix.M, segmente
 				continue
 			}
 			minutiaeType := matchMinutiaeType(skeleton, x, y)
-			if minutiaeType != Unknown {
-				minutiae := Minutiae{
+			if minutiaeType != matching.Unknown {
+				minutiae := matching.Minutiae{
 					X:     x,
 					Y:     y,
 					Angle: filteredDirectional.At(x, y),
@@ -42,7 +28,7 @@ func ExtractMinutiae(skeleton *matrix.M, filteredDirectional *matrix.M, segmente
 	return minutiaes
 }
 
-func matchMinutiaeType(in *matrix.M, x, y int) MinutiaeType {
+func matchMinutiaeType(in *matrix.M, x, y int) matching.MinutiaeType {
 	p0 := in.At(x-1, y-1) > 0
 	p1 := in.At(x, y-1) > 0
 	p2 := in.At(x+1, y-1) > 0
@@ -92,10 +78,10 @@ func matchMinutiaeType(in *matrix.M, x, y int) MinutiaeType {
 		f(pc, p7, !p0, !p1, !p2, !p3, !p4, !p5, !p6))
 
 	if isBifurcation {
-		return Bifurcation
+		return matching.Bifurcation
 	} else if isTermination {
-		return Termination
+		return matching.Termination
 	} else {
-		return Unknown
+		return matching.Unknown
 	}
 }
