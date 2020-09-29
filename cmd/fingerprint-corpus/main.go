@@ -89,18 +89,18 @@ func processImage(in *matrix.M) {
 	showImage("Normalized", normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
-	kernel.SobelDx.ParallelConvolution(normalized, gx)
-	kernel.SobelDy.ParallelConvolution(normalized, gy)
+	kernel.SobelDx.ConvoluteParallelized(normalized, gx)
+	kernel.SobelDy.ConvoluteParallelized(normalized, gy)
 
 	// Compute filtered directional
 	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
-	kernel.FilteredDirectional(gx, gy, 4).ParallelConvolution(filteredD, filteredD)
+	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
 	processing.Normalize(filteredD, normFilteredD)
 	showImage("Filtered Directional", normFilteredD)
 
 	// Compute segmented image
 	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
-	kernel.Variance(filteredD).Convolution(normalized, segmented)
+	kernel.Variance(filteredD).Convolute(normalized, segmented)
 	processing.Normalize(segmented, normSegmented)
 	showImage("Filtered Directional Std Dev.", normSegmented)
 

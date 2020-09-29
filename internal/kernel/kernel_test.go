@@ -29,7 +29,7 @@ func TestKernelMultiplicationConvolution(t *testing.T) {
 	out := matrix.New(bounds)
 	setMatrixTo(a, 1.0)
 	setMatrixTo(b, 2.0)
-	Multiplication(a, b, 1).Convolution(a, out)
+	Multiplication(a, b, 1).Convolute(a, out)
 
 	computedBounds := image.Rect(1, 1, 11, 11)
 	assertValues(t, out, computedBounds, 18.0)
@@ -41,10 +41,36 @@ func TestKernelMultiplicationParallelConvolution(t *testing.T) {
 	out := matrix.New(bounds)
 	setMatrixTo(a, 1.0)
 	setMatrixTo(b, 2.0)
-	Multiplication(a, b, 1).ParallelConvolution(a, out)
+	Multiplication(a, b, 1).ConvoluteParallelized(a, out)
 
 	computedBounds := image.Rect(1, 1, 11, 11)
 	assertValues(t, out, computedBounds, 18.0)
+}
+
+func TestGenerateSubImagesBounds(t *testing.T) {
+	a := newMatrix(0, 0, 12, 8)
+	subImages := generateSubImages(a, 1)
+	boundsList := collectBounds(subImages...)
+
+	expected := []image.Rectangle{
+		image.Rect(0, 0, 7, 7),
+		image.Rect(0, 5, 7, 8),
+		image.Rect(5, 0, 12, 7),
+		image.Rect(5, 5, 12, 8),
+	}
+	assert.Equal(t, expected, boundsList)
+}
+
+func newMatrix(a, b, c, d int) *matrix.M {
+	return matrix.New(image.Rect(a, b, c, d))
+}
+
+func collectBounds(matrix ...*matrix.M) []image.Rectangle {
+	bounds := []image.Rectangle{}
+	for _, m := range matrix {
+		bounds = append(bounds, m.Bounds())
+	}
+	return bounds
 }
 
 func setMatrixTo(m *matrix.M, value float64) {
