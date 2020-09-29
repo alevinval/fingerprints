@@ -12,8 +12,8 @@ const (
 )
 
 type Minutiae struct {
-	X     int
-	Y     int
-	Angle float64
-	Type  MinutiaeType
+	X     int          `json:"x"`
+	Y     int          `json:"y"`
+	Angle float64      `json:"angle"`
+	Type  MinutiaeType `json:"type"`
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	_ "image/jpeg"
 	"image/png"
 	"log"
@@ -60,8 +61,10 @@ func processImage(in *matrix.M) {
 		log.Printf("Type=%v, Angle=%f", minutiae.Type, minutiae.Angle)
 		out.Set(minutiae.X, minutiae.Y, 255.0)
 	}
-
 	showImage("Minutiaes", out)
+
+	d, _ := json.Marshal(minutiaes)
+	println(string(d))
 }
 
 func main() {

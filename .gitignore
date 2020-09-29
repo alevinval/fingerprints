@@ -3,3 +3,5 @@ out/
 /fingerprint-corpus.exe
 /extract-features
 /extract-features.exe
+/compare-features
+/compare-features.exe
