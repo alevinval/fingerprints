@@ -66,8 +66,7 @@ func processImage(in *matrix.M) {
 
 	out := matrix.New(bounds)
 	for _, minutiae := range minutiaes {
-		log.Printf("Found minutiae at %d, %d", minutiae.X, minutiae.Y)
-		log.Printf("Type=%v, Angle=%f", minutiae.Type, minutiae.Angle)
+		log.Printf("found: %s", minutiae)
 		out.Set(minutiae.X, minutiae.Y, 255.0)
 	}
 
@@ -75,6 +74,7 @@ func processImage(in *matrix.M) {
 }
 
 func main() {
+	log.SetFlags(log.Flags() + log.Lshortfile)
 	img := cmdhelper.LoadImage("corpus/nist3.jpg")
 	processImage(img)
 }

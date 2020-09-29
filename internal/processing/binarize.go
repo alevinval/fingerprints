@@ -1,6 +1,7 @@
 package processing
 
 import (
+	"log"
 	"math"
 
 	"github.com/alevinval/fingerprints/internal/matrix"
@@ -48,8 +49,7 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 			}
 		}
 	}
-	println("Found ", region, " regions")
-	println("Building histogram")
+	log.Printf("regions found: %d", region)
 	histogram := make([]int, region)
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
@@ -64,12 +64,14 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 
 	mean := sum / float64(region)
 
-	println("Erasing regions")
+	erasedRegions := 0
 	for region, area := range histogram {
 		if float64(area) < math.Sqrt(mean) {
 			eraseRegion(p, in, region)
+			erasedRegions++
 		}
 	}
+	log.Printf("erased regions: %d", erasedRegions)
 	return p
 }
 
