@@ -3,8 +3,7 @@ package cmdhelper
 import (
 	"image"
 	"image/color"
-	_ "image/jpeg"
-	_ "image/png"
+	"image/jpeg"
 	"log"
 	"os"
 
@@ -38,14 +37,14 @@ func maybeResizeImage(img image.Image) image.Image {
 // LoadImage opens a file and attempts to decode the image
 // If the dimensions of the image are bigger than expected, then
 // the image is resized to fit the expected resolution.
-func LoadImage(name string) *matrix.M {
+func LoadImage(name string) (image.Image, *matrix.M) {
 	f, err := os.Open(name)
 	if err != nil {
 		log.Fatalf("cannot open image %s, err: %s", name, err)
 	}
 	defer f.Close()
 
-	img, _, err := image.Decode(f)
+	img, err := jpeg.Decode(f)
 	if err != nil {
 		log.Fatalf("cannot decode image %s, err: %s", name, err)
 	}
@@ -54,12 +53,14 @@ func LoadImage(name string) *matrix.M {
 
 	bounds := resizedImg.Bounds()
 	gray := image.NewGray(bounds)
+	rgba := image.NewNRGBA(bounds)
 	for x := 0; x < bounds.Max.X; x++ {
 		for y := 0; y < bounds.Max.Y; y++ {
 			c := resizedImg.At(x, y)
 			gray.Set(x, y, color.GrayModel.Convert(c))
+			rgba.Set(x, y, color.NRGBAModel.Convert(c))
 		}
 	}
 
-	return matrix.NewFromGray(gray)
+	return rgba, matrix.NewFromGray(gray)
 }

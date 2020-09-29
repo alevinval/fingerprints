@@ -10,8 +10,8 @@ import (
 
 func main() {
 	path := os.Args[1]
-	img := cmdhelper.LoadImage(path)
-	minutia := matching.ExtractFeatures(img)
+	_, m := cmdhelper.LoadImage(path)
+	minutia := matching.ExtractFeatures(m)
 	d, _ := json.Marshal(minutia)
 	println(string(d))
 }
