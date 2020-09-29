@@ -5,8 +5,8 @@ import (
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
 
-func ExtractFeatures(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) []matching.Minutiae {
-	minutiaes := []matching.Minutiae{}
+func ExtractFeatures(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) matching.MinutiaeList {
+	minutiaes := matching.MinutiaeList{}
 	bounds := skeleton.Bounds()
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {

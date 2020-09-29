@@ -1,5 +1,5 @@
 package matching
 
-func Match(l1, l2 *[]Minutiae) {
+func Match(l1, l2 *MinutiaeList) {
 
 }

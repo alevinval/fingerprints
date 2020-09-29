@@ -1,6 +1,9 @@
 package matching
 
-type MinutiaeType byte
+type (
+	MinutiaeType byte
+	MinutiaeList []Minutiae
+)
 
 const (
 	Termination MinutiaeType = iota
