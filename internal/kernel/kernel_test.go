@@ -49,8 +49,7 @@ func TestKernelMultiplicationParallelConvolution(t *testing.T) {
 
 func TestGenerateSubImagesBounds(t *testing.T) {
 	a := newMatrix(0, 0, 12, 8)
-	subImages := generateSubImages(a, 1)
-	boundsList := collectBounds(subImages...)
+	boundsList := generateSubBounds(a, 1)
 
 	expected := []image.Rectangle{
 		image.Rect(0, 0, 7, 7),
@@ -63,14 +62,6 @@ func TestGenerateSubImagesBounds(t *testing.T) {
 
 func newMatrix(a, b, c, d int) *matrix.M {
 	return matrix.New(image.Rect(a, b, c, d))
-}
-
-func collectBounds(matrix ...*matrix.M) []image.Rectangle {
-	bounds := []image.Rectangle{}
-	for _, m := range matrix {
-		bounds = append(bounds, m.Bounds())
-	}
-	return bounds
 }
 
 func setMatrixTo(m *matrix.M, value float64) {
