@@ -12,15 +12,15 @@ import (
 func main() {
 	a, b := os.Args[1], os.Args[2]
 
-	var l1, l2 types.MinutiaeList
-	json.Unmarshal([]byte(a), &l1)
-	json.Unmarshal([]byte(b), &l2)
-	max := len(l1)
-	if len(l2) > len(l1) {
-		max = len(l2)
+	var r1, r2 types.DetectionResult
+	json.Unmarshal([]byte(a), &r1)
+	json.Unmarshal([]byte(b), &r2)
+	max := len(r1.Minutia)
+	if len(r1.Minutia) > len(r1.Minutia) {
+		max = len(r2.Minutia)
 	}
 
-	matches := matching.Match(l1, l2)
+	matches := matching.Match(r1, r2)
 	d, _ := json.Marshal(matches)
 
 	log.Printf("matched minutiaes: %d/%d", len(matches), max)

@@ -5,7 +5,7 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-func ExtractFeatures(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) types.MinutiaeList {
+func ExtractMinutia(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) types.MinutiaeList {
 	minutiaes := types.MinutiaeList{}
 	bounds := skeleton.Bounds()
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {

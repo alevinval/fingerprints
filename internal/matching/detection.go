@@ -7,7 +7,7 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-func ExtractFeatures(in *matrix.M) types.MinutiaeList {
+func Detection(in *matrix.M) *types.DetectionResult {
 	bounds := in.Bounds()
 
 	normalized := matrix.New(bounds)
@@ -33,5 +33,12 @@ func ExtractFeatures(in *matrix.M) types.MinutiaeList {
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 
-	return processing.ExtractFeatures(skeletonized, filteredD, binarizedSegmented)
+	minutia := processing.ExtractMinutia(skeletonized, filteredD, binarizedSegmented)
+	x, y := processing.ExtractOrigin(binarizedSegmented)
+	dr := &types.DetectionResult{
+		X:       x,
+		Y:       y,
+		Minutia: minutia,
+	}
+	return dr
 }

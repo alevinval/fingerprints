@@ -8,8 +8,8 @@ import (
 	"path"
 
 	"github.com/alevinval/fingerprints/internal/cmdhelper"
+	"github.com/alevinval/fingerprints/internal/debug"
 	"github.com/alevinval/fingerprints/internal/kernel"
-	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/processing"
 	"github.com/alevinval/fingerprints/internal/types"
@@ -68,7 +68,7 @@ func processImage(in *matrix.M) types.MinutiaeList {
 	processing.Skeletonize(skeletonized)
 	showMatrix("Skeletonized", skeletonized)
 
-	minutia := processing.ExtractFeatures(skeletonized, filteredD, binarizedSegmented)
+	minutia := processing.ExtractMinutia(skeletonized, filteredD, binarizedSegmented)
 
 	out := matrix.New(bounds)
 	for _, minutiae := range minutia {
@@ -85,6 +85,6 @@ func main() {
 	log.SetFlags(log.Flags() + log.Lshortfile)
 	img, m := cmdhelper.LoadImage("corpus/nist3.jpg")
 	minutia := processImage(m)
-	matching.DrawFeatures(img, minutia)
+	debug.DrawFeatures(img, minutia)
 	showImage("Debug", img)
 }

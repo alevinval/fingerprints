@@ -13,7 +13,7 @@ type variance struct {
 }
 
 func Variance(directional *matrix.M) *variance {
-	k := &variance{phy: directional, offset: 8}
+	k := &variance{phy: directional, offset: 16}
 	k.Base = Base{kernel: k}
 	return k
 }

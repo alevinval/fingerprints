@@ -6,12 +6,12 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-func Match(l1, l2 types.MinutiaeList) types.MinutiaeList {
+func Match(r1, r2 types.DetectionResult) types.MinutiaeList {
 	matches := types.MinutiaeList{}
 	matched := map[types.Minutiae]struct{}{}
 
-	for _, minutiae := range l1 {
-		for _, candidate := range l2 {
+	for _, minutiae := range r1.Minutia {
+		for _, candidate := range r2.Minutia {
 			if _, ok := matched[candidate]; ok {
 				continue
 			}

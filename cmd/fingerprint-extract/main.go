@@ -11,7 +11,7 @@ import (
 func main() {
 	path := os.Args[1]
 	_, m := cmdhelper.LoadImage(path)
-	minutia := matching.ExtractFeatures(m)
-	d, _ := json.Marshal(minutia)
+	result := matching.Detection(m)
+	d, _ := json.Marshal(result)
 	println(string(d))
 }
