@@ -80,7 +80,7 @@ func matchMinutiaeType(in *matrix.M, x, y int) MinutiaeType {
 		f(pc, p5, p7, p1, !p0, !p2, !p3, !p4, !p6) ||
 		f(pc, p5, p3, p1, !p0, !p2, !p4, !p6, !p7) ||
 		f(pc, p7, p1, p3, !p0, !p2, !p4, !p5, !p6) ||
-		f(pc, p7, p5, p3, !p0, !p2, !p3, !p4, !p6))
+		f(pc, p7, p5, p3, !p0, !p1, !p2, !p4, !p6))
 
 	isTermination := (f(pc, p0, !p1, !p2, !p3, !p4, !p5, !p6, !p7) ||
 		f(pc, p1, !p0, !p2, !p3, !p4, !p5, !p6, !p7) ||
