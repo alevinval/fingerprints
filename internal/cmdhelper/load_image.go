@@ -3,9 +3,12 @@ package cmdhelper
 import (
 	"image"
 	"image/color"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
 	"os"
 
+	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/nfnt/resize"
 )
 
@@ -32,7 +35,7 @@ func resizeImage(img image.Image) image.Image {
 	return resize.Resize(uint(xp), uint(yp), img, resize.Bilinear)
 }
 
-func LoadImage(name string) *image.Gray {
+func LoadImage(name string) *matrix.M {
 	f, err := os.Open(name)
 	if err != nil {
 		panic(err)
@@ -57,5 +60,5 @@ func LoadImage(name string) *image.Gray {
 		}
 	}
 
-	return gray
+	return matrix.NewFromGray(gray)
 }

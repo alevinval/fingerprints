@@ -75,7 +75,6 @@ func processImage(in *matrix.M) {
 }
 
 func main() {
-	original := cmdhelper.LoadImage("corpus/nist3.jpg")
-	img := matrix.NewFromGray(original)
+	img := cmdhelper.LoadImage("corpus/nist3.jpg")
 	processImage(img)
 }
