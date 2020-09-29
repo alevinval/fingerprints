@@ -45,7 +45,7 @@ func processImage(in *matrix.M) {
 
 	// Compute segmented image
 	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
-	kernel.Variance(filteredD).Convolute(normalized, segmented)
+	kernel.Variance(filteredD).ConvoluteParallelized(normalized, segmented)
 	processing.Normalize(segmented, normSegmented)
 	showImage("Filtered Directional Std Dev.", normSegmented)
 

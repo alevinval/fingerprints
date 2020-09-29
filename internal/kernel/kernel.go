@@ -17,19 +17,22 @@ type Base struct {
 }
 
 func (base *Base) ConvoluteParallelized(in, out *matrix.M) {
-	subImages := generateSubImages(in, base.kernel.Offset())
+	subBounds := generateSubBounds(in, base.kernel.Offset())
 
 	wg := &sync.WaitGroup{}
-	wg.Add(len(subImages))
-	for _, image := range subImages {
-		go base.convoluteWithWG(wg, image, out)
+	wg.Add(len(subBounds))
+	for _, bounds := range subBounds {
+		go base.convoluteWithWG(wg, in, out, bounds)
 	}
 	wg.Wait()
 }
 
 func (base *Base) Convolute(in, out *matrix.M) {
+	base.convoluteWithBounds(in, out, in.Bounds())
+}
+
+func (base *Base) convoluteWithBounds(in, out *matrix.M, bounds image.Rectangle) {
 	offset := base.kernel.Offset()
-	bounds := in.Bounds()
 	for y := bounds.Min.Y + offset; y < bounds.Max.Y-offset; y++ {
 		for x := bounds.Min.X + offset; x < bounds.Max.X-offset; x++ {
 			pixel := base.kernel.Apply(in, x, y)
@@ -38,13 +41,13 @@ func (base *Base) Convolute(in, out *matrix.M) {
 	}
 }
 
-func (base *Base) convoluteWithWG(wg *sync.WaitGroup, in, out *matrix.M) {
-	base.Convolute(in, out)
+func (base *Base) convoluteWithWG(wg *sync.WaitGroup, in, out *matrix.M, subBounds image.Rectangle) {
+	base.convoluteWithBounds(in, out, subBounds)
 	wg.Done()
 }
 
-func generateSubImages(in *matrix.M, offset int) []*matrix.M {
-	images := []*matrix.M{}
+func generateSubBounds(in *matrix.M, offset int) []image.Rectangle {
+	images := []image.Rectangle{}
 	bounds := in.Bounds()
 	blockSize := bounds.Max.X / 2
 	for x := bounds.Min.X; x < bounds.Max.X; x += blockSize {
@@ -65,7 +68,7 @@ func generateSubImages(in *matrix.M, offset int) []*matrix.M {
 			if yp > bounds.Max.Y {
 				yp = bounds.Max.Y
 			}
-			image := in.SubImage(image.Rect(xi, yi, xp, yp))
+			image := image.Rect(xi, yi, xp, yp)
 			images = append(images, image)
 		}
 	}

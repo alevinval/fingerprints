@@ -28,14 +28,15 @@ func (k *variance) Apply(in *matrix.M, x, y int) float64 {
 	sigSize := float64(k.Offset()*2 + 1)
 	signature := make([]float64, int(sigSize))
 	angle := k.phy.At(x, y) - math.Pi/2
-	for j := y - k.Offset(); j <= y+k.Offset(); j++ {
-		for i := x - k.Offset(); i <= x+k.Offset(); i++ {
-			xp := int(float64(i-x)*math.Cos(angle)-float64(j-y)*math.Sin(angle)) + x
-			yp := int(float64(i-x)*math.Sin(angle)+float64(j-y)*math.Cos(angle)) + y
+	for j := -k.Offset(); j <= k.Offset(); j++ {
+		for i := k.Offset(); i <= k.Offset(); i++ {
+			h := math.Sqrt(float64(i*i + j*j))
+			xp := x + int(h*math.Cos(angle))
+			yp := y + int(h*math.Sin(angle))
 			if xp >= 0 && xp < in.Bounds().Dx() && yp >= 0 && yp < in.Bounds().Dy() {
 				signature[pos] += in.At(xp, yp)
 			} else {
-				signature[pos] += in.At(x, y)
+				signature[pos] += 0
 			}
 		}
 		pos++

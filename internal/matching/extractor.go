@@ -21,7 +21,7 @@ func ExtractFeatures(in *matrix.M) types.MinutiaeList {
 	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
 
 	segmented := matrix.New(bounds)
-	kernel.Variance(filteredD).Convolute(normalized, segmented)
+	kernel.Variance(filteredD).ConvoluteParallelized(normalized, segmented)
 	processing.Normalize(segmented, segmented)
 
 	binarizedSegmented := matrix.New(bounds)
