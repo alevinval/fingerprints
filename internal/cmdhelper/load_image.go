@@ -12,16 +12,16 @@ import (
 	"github.com/nfnt/resize"
 )
 
-func resizeImage(img image.Image) image.Image {
-	maxDimension := 300
+const maxDimension = 300
+
+func maybeResizeImage(img image.Image) image.Image {
 	dx := img.Bounds().Dx()
 	dy := img.Bounds().Dy()
-	if dx < maxDimension && dy < maxDimension {
+	if dx <= maxDimension && dy <= maxDimension {
 		return img
 	}
 
-	xp := 0
-	yp := 0
+	xp, yp := 0, 0
 	if dx > dy {
 		xp = maxDimension
 		yp = int(float64(dy) / (float64(dx) / float64(maxDimension)))
@@ -35,28 +35,29 @@ func resizeImage(img image.Image) image.Image {
 	return resize.Resize(uint(xp), uint(yp), img, resize.Bilinear)
 }
 
+// LoadImage opens a file and attempts to decode the image
+// If the dimensions of the image are bigger than expected, then
+// the image is resized to fit the expected resolution.
 func LoadImage(name string) *matrix.M {
 	f, err := os.Open(name)
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot open image %s, err: %s", name, err)
 	}
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot decode image %s, err: %s", name, err)
 	}
 
-	resizedImg := resizeImage(img)
+	resizedImg := maybeResizeImage(img)
 
 	bounds := resizedImg.Bounds()
-	w, h := bounds.Max.X, bounds.Max.Y
 	gray := image.NewGray(bounds)
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			oldColor := resizedImg.At(x, y)
-			grayColor := color.GrayModel.Convert(oldColor)
-			gray.Set(x, y, grayColor)
+	for x := 0; x < bounds.Max.X; x++ {
+		for y := 0; y < bounds.Max.Y; y++ {
+			c := resizedImg.At(x, y)
+			gray.Set(x, y, color.GrayModel.Convert(c))
 		}
 	}
 
