@@ -17,29 +17,6 @@ import (
 
 var outFolder = "out"
 
-func resizeImage(img image.Image) image.Image {
-	maxDimension := 300
-	dx := img.Bounds().Dx()
-	dy := img.Bounds().Dy()
-	if dx < maxDimension && dy < maxDimension {
-		return img
-	}
-
-	xp := 0
-	yp := 0
-	if dx > dy {
-		xp = maxDimension
-		yp = int(float64(dy) / (float64(dx) / float64(maxDimension)))
-	} else if dy > dx {
-		yp = maxDimension
-		xp = int(float64(dx) / (float64(dy) / float64(maxDimension)))
-	} else {
-		xp, yp = maxDimension, maxDimension
-	}
-	log.Printf("resizing image from (%d,%d) to (%d,%d)", dx, dy, xp, yp)
-	return resize.Resize(uint(xp), uint(yp), img, resize.Bilinear)
-}
-
 func loadImage(name string) *image.Gray {
 	f, err := os.Open(name)
 	if err != nil {
@@ -68,6 +45,29 @@ func loadImage(name string) *image.Gray {
 	return gray
 }
 
+func resizeImage(img image.Image) image.Image {
+	maxDimension := 300
+	dx := img.Bounds().Dx()
+	dy := img.Bounds().Dy()
+	if dx < maxDimension && dy < maxDimension {
+		return img
+	}
+
+	xp := 0
+	yp := 0
+	if dx > dy {
+		xp = maxDimension
+		yp = int(float64(dy) / (float64(dx) / float64(maxDimension)))
+	} else if dy > dx {
+		yp = maxDimension
+		xp = int(float64(dx) / (float64(dy) / float64(maxDimension)))
+	} else {
+		xp, yp = maxDimension, maxDimension
+	}
+	log.Printf("resizing image from (%d,%d) to (%d,%d)", dx, dy, xp, yp)
+	return resize.Resize(uint(xp), uint(yp), img, resize.Bilinear)
+}
+
 func showImage(title string, in *matrix.M) {
 	f, err := os.Create(path.Join(outFolder, title+".png"))
 	if err != nil {
@@ -81,39 +81,29 @@ func showImage(title string, in *matrix.M) {
 
 func processImage(in *matrix.M) {
 	bounds := in.Bounds()
-	normalized := matrix.New(bounds)
 
+	normalized := matrix.New(bounds)
 	processing.Normalize(in, normalized)
-	showImage("Normalized", normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
 	kernel.SobelDx.ConvoluteParallelized(normalized, gx)
 	kernel.SobelDy.ConvoluteParallelized(normalized, gy)
 
-	// Compute filtered directional
-	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
+	filteredD := matrix.New(bounds)
 	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
-	processing.Normalize(filteredD, normFilteredD)
-	showImage("Filtered Directional", normFilteredD)
 
-	// Compute segmented image
-	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
+	segmented := matrix.New(bounds)
 	kernel.Variance(filteredD).Convolute(normalized, segmented)
-	processing.Normalize(segmented, normSegmented)
-	showImage("Filtered Directional Std Dev.", normSegmented)
+	processing.Normalize(segmented, segmented)
 
-	// Compute binarized segmented image
 	binarizedSegmented := matrix.New(bounds)
-	processing.Binarize(normSegmented, binarizedSegmented)
+	processing.Binarize(segmented, binarizedSegmented)
 	processing.BinarizeEnhancement(binarizedSegmented)
-	showImage("Binarized Segmented", binarizedSegmented)
 
-	// Binarize normalized image
 	skeletonized := matrix.New(bounds)
 	processing.Binarize(normalized, skeletonized)
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
-	showImage("Skeletonized", skeletonized)
 
 	minutiaes := processing.ExtractMinutiae(skeletonized, filteredD, binarizedSegmented)
 
