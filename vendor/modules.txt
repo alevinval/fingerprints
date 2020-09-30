@@ -1,4 +1,5 @@
-# github.com/davecgh/go-spew v1.1.0
+# github.com/davecgh/go-spew v1.1.1
+## explicit
 github.com/davecgh/go-spew/spew
 # github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 ## explicit
