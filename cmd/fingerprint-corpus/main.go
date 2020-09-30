@@ -80,6 +80,7 @@ func processImage(img image.Image, in *matrix.M) {
 
 func main() {
 	log.SetFlags(log.Flags() + log.Lshortfile)
-	img, m := helpers.LoadImage("corpus/nist4.png")
+	fname := os.Args[1]
+	img, m := helpers.LoadImage(fname)
 	processImage(img, m)
 }
