@@ -4,8 +4,10 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
+	"image/png"
 	"log"
 	"os"
+	"path"
 
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/nfnt/resize"
@@ -37,16 +39,25 @@ func maybeResizeImage(img image.Image) image.Image {
 // LoadImage opens a file and attempts to decode the image
 // If the dimensions of the image are bigger than expected, then
 // the image is resized to fit the expected resolution.
-func LoadImage(name string) (image.Image, *matrix.M) {
-	f, err := os.Open(name)
+func LoadImage(fname string) (image.Image, *matrix.M) {
+	f, err := os.Open(fname)
 	if err != nil {
-		log.Fatalf("cannot open image %s, err: %s", name, err)
+		log.Fatalf("cannot open image %s, err: %s", fname, err)
 	}
 	defer f.Close()
 
-	img, err := jpeg.Decode(f)
+	var img image.Image
+
+	ext := path.Ext(fname)
+	if ext == ".jpg" {
+		img, err = jpeg.Decode(f)
+	} else if ext == ".png" {
+		img, err = png.Decode(f)
+	} else {
+		log.Fatalf("%q extension not supported", ext)
+	}
 	if err != nil {
-		log.Fatalf("cannot decode image %s, err: %s", name, err)
+		log.Fatalf("cannot decode image %s, err: %s", fname, err)
 	}
 
 	resizedImg := maybeResizeImage(img)
