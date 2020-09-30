@@ -1,8 +1,8 @@
 package types
 
+import "image"
+
 type Frame struct {
-	Xmin int `json:"xmin"`
-	Ymin int `json:"ymin"`
-	Xmax int `json:"xmax"`
-	Ymax int `json:"ymax"`
+	Horizontal image.Rectangle
+	Vertical   image.Rectangle
 }

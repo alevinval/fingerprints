@@ -16,11 +16,17 @@ var (
 func DrawFeatures(original image.Image, result *types.DetectionResult) {
 	dst := original.(draw.Image)
 
-	drawFillSquare(dst, result.Frame.Xmin, result.Frame.Ymin, blue)
-	drawFillSquare(dst, result.Frame.Xmax, result.Frame.Ymax, blue)
+	drawFrame(dst, result.Frame.Horizontal, blue)
+	drawFrame(dst, result.Frame.Vertical, blue)
+
 	for _, minutiae := range result.Minutia {
 		drawFillSquare(dst, minutiae.X, minutiae.Y, red)
 	}
+}
+
+func drawFrame(dst draw.Image, r image.Rectangle, c color.Color) {
+	drawFillSquare(dst, r.Bounds().Min.X, r.Bounds().Min.Y, c)
+	drawFillSquare(dst, r.Bounds().Max.X, r.Bounds().Max.Y, c)
 }
 
 func drawFillSquare(dst draw.Image, x, y int, c color.Color) {
