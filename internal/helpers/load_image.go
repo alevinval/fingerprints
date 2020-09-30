@@ -1,4 +1,4 @@
-package cmdhelper
+package helpers
 
 import (
 	"image"

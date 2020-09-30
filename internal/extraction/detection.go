@@ -14,10 +14,9 @@ func DetectionResult(in *matrix.M) *types.DetectionResult {
 	processing.Normalize(in, normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
+	filteredD := matrix.New(bounds)
 	kernel.SobelDx.ConvoluteParallelized(normalized, gx)
 	kernel.SobelDy.ConvoluteParallelized(normalized, gy)
-
-	filteredD := matrix.New(bounds)
 	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
 
 	segmented := matrix.New(bounds)

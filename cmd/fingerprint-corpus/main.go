@@ -7,9 +7,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/alevinval/fingerprints/internal/cmdhelper"
 	"github.com/alevinval/fingerprints/internal/debug"
 	"github.com/alevinval/fingerprints/internal/extraction"
+	"github.com/alevinval/fingerprints/internal/helpers"
 	"github.com/alevinval/fingerprints/internal/kernel"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/processing"
@@ -77,6 +77,6 @@ func processImage(img image.Image, in *matrix.M) {
 
 func main() {
 	log.SetFlags(log.Flags() + log.Lshortfile)
-	img, m := cmdhelper.LoadImage("corpus/nist3.jpg")
+	img, m := helpers.LoadImage("corpus/nist3.jpg")
 	processImage(img, m)
 }

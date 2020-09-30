@@ -5,6 +5,7 @@ import (
 	"image"
 	"testing"
 
+	"github.com/alevinval/fingerprints/internal/helpers"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/stretchr/testify/assert"
 )
@@ -49,7 +50,7 @@ func TestKernelMultiplicationParallelConvolution(t *testing.T) {
 
 func TestGenerateSubImagesBounds(t *testing.T) {
 	a := newMatrix(0, 0, 12, 8)
-	boundsList := generateSubBounds(a, 1)
+	boundsList := helpers.GenerateSubBounds(a, 1)
 
 	expected := []image.Rectangle{
 		image.Rect(0, 0, 7, 7),
