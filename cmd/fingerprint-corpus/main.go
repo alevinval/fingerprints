@@ -9,8 +9,8 @@ import (
 
 	"github.com/alevinval/fingerprints/internal/cmdhelper"
 	"github.com/alevinval/fingerprints/internal/debug"
+	"github.com/alevinval/fingerprints/internal/extraction"
 	"github.com/alevinval/fingerprints/internal/kernel"
-	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/processing"
 )
@@ -69,7 +69,7 @@ func processImage(img image.Image, in *matrix.M) {
 
 	// Run the whole thing again, the steps above are just intermediates
 	// so we can have visibility on the algorithms
-	result := matching.Detection(in)
+	result := extraction.DetectionResult(in)
 
 	debug.DrawFeatures(img, result)
 	showImage("Debug", img)

@@ -1,4 +1,4 @@
-package matching
+package extraction
 
 import (
 	"github.com/alevinval/fingerprints/internal/kernel"
@@ -7,7 +7,7 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-func Detection(in *matrix.M) *types.DetectionResult {
+func DetectionResult(in *matrix.M) *types.DetectionResult {
 	bounds := in.Bounds()
 
 	normalized := matrix.New(bounds)
@@ -33,8 +33,8 @@ func Detection(in *matrix.M) *types.DetectionResult {
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 
-	minutia := processing.ExtractMinutia(skeletonized, filteredD, binarizedSegmented)
-	frame := processing.ExtractFrame(binarizedSegmented)
+	minutia := Minutia(skeletonized, filteredD, binarizedSegmented)
+	frame := Frame(binarizedSegmented)
 	dr := &types.DetectionResult{
 		Frame:   frame,
 		Minutia: minutia,

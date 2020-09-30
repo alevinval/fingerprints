@@ -1,4 +1,4 @@
-package processing
+package extraction
 
 import (
 	"image"
@@ -15,7 +15,7 @@ const (
 	yAxis
 )
 
-func ExtractFrame(binarizedSegmented *matrix.M) types.Frame {
+func Frame(binarizedSegmented *matrix.M) types.Frame {
 	h := findHorizontalAxis(binarizedSegmented, false)
 	v := findVerticalAxis(binarizedSegmented, false)
 	return types.Frame{Horizontal: h, Vertical: v}
