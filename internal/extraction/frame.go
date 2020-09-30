@@ -18,7 +18,9 @@ const (
 func Frame(binarizedSegmented *matrix.M) types.Frame {
 	h := findHorizontalAxis(binarizedSegmented, false)
 	v := findVerticalAxis(binarizedSegmented, false)
-	return types.Frame{Horizontal: h, Vertical: v}
+
+	d := image.Rect(h.Min.X, v.Min.Y, h.Max.X, v.Max.Y)
+	return types.Frame{Horizontal: h, Vertical: v, Diagonal: d}
 }
 
 func providePoints(bounds image.Rectangle, axis Axis, isReversed bool, f func(n int)) {
