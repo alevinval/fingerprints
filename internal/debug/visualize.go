@@ -31,9 +31,12 @@ func drawFrame(dst draw.Image, r image.Rectangle, c color.Color) {
 
 func drawFillSquare(dst draw.Image, x, y int, c color.Color) {
 	dst.Set(x, y, c)
-	dst.Set(x+1, y, c)
-	dst.Set(x+1, y+1, c)
-	dst.Set(x+1, y-1, c)
 	dst.Set(x, y-1, c)
 	dst.Set(x, y+1, c)
+	dst.Set(x+1, y, c)
+	dst.Set(x+1, y-1, c)
+	dst.Set(x+1, y+1, c)
+	dst.Set(x-1, y, c)
+	dst.Set(x-1, y-1, c)
+	dst.Set(x-1, y+1, c)
 }
