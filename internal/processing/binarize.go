@@ -5,26 +5,18 @@ import (
 	"math"
 
 	"github.com/alevinval/fingerprints/internal/matrix"
+	"github.com/alevinval/fingerprints/internal/types"
 )
 
 const BLACK = 0
 const WHITE = 255
 
-func Binarize(in, out *matrix.M) {
-	var sum float64
-
+func Binarize(in, out *matrix.M, meta types.Metadata) {
 	bounds := in.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			sum += in.At(x, y)
-		}
-	}
-
-	mean := sum / float64(bounds.Dx()*bounds.Dy())
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			pixel := in.At(x, y)
-			if float64(pixel) < mean/(math.Pi/2) {
+			if float64(pixel) < meta.MeanValue/(math.Pi/2) {
 				out.Set(x, y, BLACK)
 			} else {
 				out.Set(x, y, WHITE)

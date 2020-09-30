@@ -10,8 +10,9 @@ import (
 func DetectionResult(in *matrix.M) *types.DetectionResult {
 	bounds := in.Bounds()
 
+	metaIn := processing.Metadata(in)
 	normalized := matrix.New(bounds)
-	processing.Normalize(in, normalized)
+	processing.Normalize(in, normalized, metaIn)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
 	filteredD := matrix.New(bounds)
@@ -20,15 +21,16 @@ func DetectionResult(in *matrix.M) *types.DetectionResult {
 	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
 
 	segmented := matrix.New(bounds)
+	metaSegmented := processing.Metadata(in)
 	kernel.Variance(filteredD).ConvoluteParallelized(normalized, segmented)
-	processing.Normalize(segmented, segmented)
+	processing.Normalize(segmented, segmented, metaSegmented)
 
 	binarizedSegmented := matrix.New(bounds)
-	processing.Binarize(segmented, binarizedSegmented)
+	processing.Binarize(segmented, binarizedSegmented, metaSegmented)
 	processing.BinarizeEnhancement(binarizedSegmented)
 
 	skeletonized := matrix.New(bounds)
-	processing.Binarize(normalized, skeletonized)
+	processing.Binarize(normalized, skeletonized, metaIn)
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 
