@@ -7,13 +7,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/alevinval/fingerprints/internal/cmdhelper"
 	"github.com/alevinval/fingerprints/internal/debug"
+	"github.com/alevinval/fingerprints/internal/extraction"
+	"github.com/alevinval/fingerprints/internal/helpers"
 	"github.com/alevinval/fingerprints/internal/kernel"
-	"github.com/alevinval/fingerprints/internal/matching"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/processing"
-	"github.com/alevinval/fingerprints/internal/types"
 )
 
 var outFolder = "out"
@@ -26,14 +25,13 @@ func showImage(title string, img image.Image) {
 	defer f.Close()
 
 	png.Encode(f, img)
-	// jpeg.Encode(f, img, &jpeg.Options{100})
 }
 
 func showMatrix(title string, m *matrix.M) {
 	showImage(title, m.ToGray())
 }
 
-func processImage(in *matrix.M) *types.DetectionResult {
+func processImage(img image.Image, in *matrix.M) {
 	bounds := in.Bounds()
 	normalized := matrix.New(bounds)
 
@@ -71,23 +69,14 @@ func processImage(in *matrix.M) *types.DetectionResult {
 
 	// Run the whole thing again, the steps above are just intermediates
 	// so we can have visibility on the algorithms
-	result := matching.Detection(in)
+	result := extraction.DetectionResult(in)
 
-	out := matrix.New(bounds)
-	for _, minutiae := range result.Minutia {
-		log.Printf("found: %s", minutiae)
-		out.Set(minutiae.X, minutiae.Y, 255.0)
-	}
-
-	showMatrix("Minutiaes", out)
-
-	return result
+	debug.DrawFeatures(img, result)
+	showImage("Debug", img)
 }
 
 func main() {
 	log.SetFlags(log.Flags() + log.Lshortfile)
-	img, m := cmdhelper.LoadImage("corpus/nist3.jpg")
-	result := processImage(m)
-	debug.DrawFeatures(img, result)
-	showImage("Debug", img)
+	img, m := helpers.LoadImage("corpus/nist3.jpg")
+	processImage(img, m)
 }

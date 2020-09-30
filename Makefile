@@ -16,4 +16,4 @@ corpus: clean build
 	./fingerprint-corpus out
 
 test-extract-match:
-	./scripts/test-extract-and-match.sh
+	bash -c "./scripts/test-extract-and-match.sh"

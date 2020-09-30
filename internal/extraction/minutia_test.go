@@ -1,4 +1,4 @@
-package processing
+package extraction
 
 import (
 	"image"
@@ -22,7 +22,7 @@ func TestExtractFeatures(t *testing.T) {
 	skeleton.Set(1, 2, 1.0)
 	skeleton.Set(2, 1, 1.0)
 
-	minutiaes := ExtractMinutia(skeleton, filteredDirectional, segmented)
+	minutiaes := Minutia(skeleton, filteredDirectional, segmented)
 	assert.NotEmpty(t, minutiaes)
 	first := minutiaes[0]
 	assert.Equal(t, types.Bifurcation, first.Type)
