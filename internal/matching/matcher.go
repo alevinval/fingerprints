@@ -10,8 +10,8 @@ func Match(r1, r2 types.DetectionResult) types.MinutiaeList {
 	matches := types.MinutiaeList{}
 	matched := map[types.Minutiae]struct{}{}
 
-	for _, minutiae := range r1.Minutia {
-		for _, candidate := range r2.Minutia {
+	for _, minutiae := range r1.RelativeMinutia() {
+		for _, candidate := range r2.RelativeMinutia() {
 			if _, ok := matched[candidate]; ok {
 				continue
 			}

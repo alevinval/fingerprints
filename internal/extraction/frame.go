@@ -18,8 +18,8 @@ const (
 func Frame(binarizedSegmented *matrix.M) types.Frame {
 	h := findHorizontalAxis(binarizedSegmented, false)
 	v := findVerticalAxis(binarizedSegmented, false)
-
 	d := image.Rect(h.Min.X, v.Min.Y, h.Max.X, v.Max.Y)
+
 	return types.Frame{Horizontal: h, Vertical: v, Diagonal: d}
 }
 
