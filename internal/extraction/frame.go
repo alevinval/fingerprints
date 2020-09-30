@@ -3,6 +3,7 @@ package extraction
 import (
 	"image"
 	"log"
+	"math"
 
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/types"
@@ -20,7 +21,12 @@ func Frame(binarizedSegmented *matrix.M) types.Frame {
 	v := findVerticalAxis(binarizedSegmented, false)
 	d := image.Rect(h.Min.X, v.Min.Y, h.Max.X, v.Max.Y)
 
-	return types.Frame{Horizontal: h, Vertical: v, Diagonal: d}
+	hx, hy := halfPoint(h)
+	vx, vy := halfPoint(v)
+	angle := math.Sin(float64(hx-vx) / float64(hy-vy))
+
+	log.Printf("frame angle: %f", angle*180/math.Pi)
+	return types.Frame{Horizontal: h, Vertical: v, Diagonal: d, Angle: angle}
 }
 
 func providePoints(bounds image.Rectangle, axis Axis, isReversed bool, f func(n int)) {
@@ -100,16 +106,20 @@ func findAxis(in *matrix.M, firstAxis, secondAxis Axis, isReversed bool) image.R
 
 func mergeFrame(a, b types.Frame) types.Frame {
 	return types.Frame{
-		Horizontal: geometricMean(a.Horizontal, b.Horizontal),
-		Vertical:   geometricMean(a.Vertical, b.Vertical),
+		Horizontal: halfPointAB(a.Horizontal, b.Horizontal),
+		Vertical:   halfPointAB(a.Vertical, b.Vertical),
 	}
 }
 
-func geometricMean(a, b image.Rectangle) image.Rectangle {
+func halfPointAB(a, b image.Rectangle) image.Rectangle {
 	return image.Rect(
 		int((a.Min.X+b.Min.X)/2),
 		int((a.Min.Y+b.Min.Y)/2),
 		int((a.Max.X+b.Max.X)/2),
 		int((a.Max.Y+b.Max.Y)/2),
 	)
+}
+
+func halfPoint(r image.Rectangle) (int, int) {
+	return (r.Max.X + r.Min.X) / 2, (r.Max.Y + r.Min.Y) / 2
 }
