@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"image"
+	"sync"
 
 	"github.com/alevinval/fingerprints/internal/matrix"
 )
@@ -35,4 +36,14 @@ func GenerateSubBounds(in *matrix.M, offset int) []image.Rectangle {
 		}
 	}
 	return subBounds
+}
+
+func RunInParallel(in *matrix.M, offset int, fn func(wg *sync.WaitGroup, bounds image.Rectangle)) {
+	subBounds := GenerateSubBounds(in, offset)
+	wg := new(sync.WaitGroup)
+	wg.Add(len(subBounds))
+	for _, bounds := range subBounds {
+		go fn(wg, bounds)
+	}
+	wg.Wait()
 }

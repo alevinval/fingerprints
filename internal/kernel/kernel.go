@@ -20,7 +20,7 @@ type Base struct {
 func (base *Base) ConvoluteParallelized(in, out *matrix.M) {
 	subBounds := helpers.GenerateSubBounds(in, base.kernel.Offset())
 
-	wg := &sync.WaitGroup{}
+	wg := new(sync.WaitGroup)
 	wg.Add(len(subBounds))
 	for _, bounds := range subBounds {
 		go base.convoluteWithWG(wg, in, out, bounds)
