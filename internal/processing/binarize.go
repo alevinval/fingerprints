@@ -1,25 +1,36 @@
 package processing
 
 import (
+	"image"
 	"log"
 	"math"
+	"sync"
 
+	"github.com/alevinval/fingerprints/internal/helpers"
 	"github.com/alevinval/fingerprints/internal/matrix"
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-const BLACK = 0
-const WHITE = 255
+const (
+	black = 0
+	white = 255
+)
 
 func Binarize(in, out *matrix.M, meta types.Metadata) {
-	bounds := in.Bounds()
+	helpers.RunInParallel(in, 0, func(wg *sync.WaitGroup, bounds image.Rectangle) {
+		threshold := meta.MeanValue / (math.Pi / 2)
+		doBinarize(in, out, bounds, threshold)
+		wg.Done()
+	})
+}
+
+func doBinarize(in *matrix.M, out *matrix.M, bounds image.Rectangle, threshold float64) {
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			pixel := in.At(x, y)
-			if float64(pixel) < meta.MeanValue/(math.Pi/2) {
-				out.Set(x, y, BLACK)
+			if in.At(x, y) < threshold {
+				out.Set(x, y, black)
 			} else {
-				out.Set(x, y, WHITE)
+				out.Set(x, y, white)
 			}
 		}
 	}
@@ -32,11 +43,11 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 	region := 1
 	for y := bounds.Min.Y + 1; y < bounds.Max.Y-1; y++ {
 		for x := bounds.Min.X + 1; x < bounds.Max.X-1; x++ {
-			if p.At(x, y) == BLACK || p.At(x, y) == WHITE {
+			if p.At(x, y) == black || p.At(x, y) == white {
 				fillRegion(p, region, x, y, 0)
 				region++
 			}
-			if region == WHITE {
+			if region == white {
 				region++
 			}
 		}
@@ -109,10 +120,10 @@ func eraseRegion(p, in *matrix.M, region int) {
 			value := p.At(x, y)
 			if int(value) != region {
 				continue
-			} else if value == WHITE {
-				in.Set(x, y, BLACK)
+			} else if value == white {
+				in.Set(x, y, black)
 			} else {
-				in.Set(x, y, WHITE)
+				in.Set(x, y, white)
 			}
 		}
 	}
