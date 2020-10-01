@@ -15,7 +15,7 @@ corpus: clean build
 	mkdir out
 	./fingerprint-corpus corpus/nist3.jpg
 
-generate-readme-examples:
+generate-readme-examples: clean build
 	bash -c "./scripts/generate-readme-examples.sh"
 
 test-extract-match:
