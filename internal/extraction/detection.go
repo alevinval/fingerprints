@@ -7,6 +7,9 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
+// DetectionResult applies all the available image processing
+// algorithms to finally extract a list of minutiae. Reference
+// frame is detected too.
 func DetectionResult(in *matrix.M) *types.DetectionResult {
 	bounds := in.Bounds()
 

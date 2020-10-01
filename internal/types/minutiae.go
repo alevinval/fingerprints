@@ -10,6 +10,7 @@ type (
 const (
 	Termination MinutiaeType = iota
 	Bifurcation
+	Pore
 	Unknown
 )
 

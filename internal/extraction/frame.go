@@ -9,13 +9,8 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
-type Axis byte
-
-const (
-	xAxis Axis = iota
-	yAxis
-)
-
+// Frame detects the boundaries of the fingerprint and establishes
+// a reference point and the angle of such reference point.
 func Frame(binarizedSegmented *matrix.M) types.Frame {
 	h := findHorizontalAxis(binarizedSegmented, false)
 	v := findVerticalAxis(binarizedSegmented, false)
@@ -29,26 +24,12 @@ func Frame(binarizedSegmented *matrix.M) types.Frame {
 	return types.Frame{Horizontal: h, Vertical: v, Diagonal: d, Angle: angle}
 }
 
-func providePoints(bounds image.Rectangle, axis Axis, isReversed bool, f func(n int)) {
-	var ini, max int
-	if axis == xAxis {
-		ini = bounds.Min.X
-		max = bounds.Max.X
-	} else {
-		ini = bounds.Min.Y
-		max = bounds.Max.Y
-	}
+type axis byte
 
-	if isReversed {
-		for n := max - 1; n >= ini; n-- {
-			f(n)
-		}
-	} else {
-		for n := ini; n < max; n++ {
-			f(n)
-		}
-	}
-}
+const (
+	xAxis axis = iota
+	yAxis
+)
 
 func findVerticalAxis(binarizedSegmented *matrix.M, isReversed bool) image.Rectangle {
 	frame := findAxis(binarizedSegmented, xAxis, yAxis, isReversed)
@@ -63,7 +44,7 @@ func findHorizontalAxis(binarizedSegmented *matrix.M, isReversed bool) image.Rec
 	return frame
 }
 
-func findAxis(in *matrix.M, firstAxis, secondAxis Axis, isReversed bool) image.Rectangle {
+func findAxis(in *matrix.M, firstAxis, secondAxis axis, isReversed bool) image.Rectangle {
 	bounds := in.Bounds()
 	longestY := 0
 	a0, b0, b1 := 0, 0, 0
@@ -102,6 +83,27 @@ func findAxis(in *matrix.M, firstAxis, secondAxis Axis, isReversed bool) image.R
 		frame = image.Rect(b0, a0, b1, a0)
 	}
 	return frame
+}
+
+func providePoints(bounds image.Rectangle, ax axis, isReversed bool, f func(n int)) {
+	var ini, max int
+	if ax == xAxis {
+		ini = bounds.Min.X
+		max = bounds.Max.X
+	} else {
+		ini = bounds.Min.Y
+		max = bounds.Max.Y
+	}
+
+	if isReversed {
+		for n := max - 1; n >= ini; n-- {
+			f(n)
+		}
+	} else {
+		for n := ini; n < max; n++ {
+			f(n)
+		}
+	}
 }
 
 func mergeFrame(a, b types.Frame) types.Frame {

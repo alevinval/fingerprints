@@ -28,60 +28,123 @@ func Minutia(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matri
 	return minutiaes
 }
 
-func matchMinutiaeType(in *matrix.M, x, y int) types.MinutiaeType {
-	p0 := in.At(x-1, y-1) > 0
-	p1 := in.At(x, y-1) > 0
-	p2 := in.At(x+1, y-1) > 0
-	p3 := in.At(x+1, y) > 0
-	p4 := in.At(x+1, y+1) > 0
-	p5 := in.At(x, y+1) > 0
-	p6 := in.At(x-1, y+1) > 0
-	p7 := in.At(x-1, y) > 0
-	pc := in.At(x, y) > 0
-	f := func(pc, p0, p1, p2, p3, p4, p5, p6, p7 bool) bool {
-		return pc && p0 && p1 && p2 && p3 && p4 && p5 && p6 && p7
+func matchMinutiaeType(in *matrix.M, i, j int) types.MinutiaeType {
+	p0 := in.At(i-1, j-1) > 0
+	p1 := in.At(i, j-1) > 0
+	p2 := in.At(i+1, j-1) > 0
+	p3 := in.At(i+1, j) > 0
+	p4 := in.At(i+1, j+1) > 0
+	p5 := in.At(i, j+1) > 0
+	p6 := in.At(i-1, j+1) > 0
+	p7 := in.At(i-1, j) > 0
+	pc := in.At(i, j) > 0
+
+	and := func(f0, f1, f2, f7, fc, f3, f6, f5, f4 bool) bool {
+		return (pc == fc) && (p0 == f0) && (p1 == f1) && (p2 == f2) && (p3 == f3) && (p4 == f4) && (p5 == f5) && (p6 == f6) && (p7 == f7)
 	}
 
-	/*
-		p0 p1 p2
-		p7 pc p3
-		p6 p5 p4
-	*/
+	isPore := and(o, x, o,
+		x, o, x,
+		o, x, o)
+
+	if isPore {
+		return types.Pore
+	}
+
 	isBifurcation := (
 	// Diagonals
-	f(pc, p0, p3, p5, !p1, !p2, !p4, !p6, !p7) ||
-		f(pc, p4, p1, p7, !p0, !p2, !p3, !p5, !p6) ||
-		f(pc, p2, p7, p5, !p0, !p1, !p3, !p4, !p6) ||
-		f(pc, p6, p1, p3, !p0, !p2, !p4, !p5, !p7) ||
-		// Verticals/Horizontals
-		f(pc, p1, p6, p4, !p0, !p2, !p3, !p5, !p7) ||
-		f(pc, p3, p0, p6, !p1, !p2, !p4, !p5, !p7) ||
-		f(pc, p5, p0, p2, !p1, !p3, !p4, !p6, !p7) ||
-		f(pc, p6, p2, p4, !p0, !p1, !p3, !p5, !p7) ||
-		// Perpendiculars clock and counter-clock wise
-		f(pc, p1, p3, p5, !p0, !p2, !p4, !p6, !p7) ||
-		f(pc, p1, p7, p5, !p0, !p2, !p3, !p4, !p6) ||
-		f(pc, p3, p7, p5, !p0, !p1, !p2, !p4, !p6) ||
-		f(pc, p3, p7, p1, !p0, !p2, !p4, !p5, !p6) ||
-		f(pc, p5, p7, p1, !p0, !p2, !p3, !p4, !p6) ||
-		f(pc, p5, p3, p1, !p0, !p2, !p4, !p6, !p7) ||
-		f(pc, p7, p1, p3, !p0, !p2, !p4, !p5, !p6) ||
-		f(pc, p7, p5, p3, !p0, !p1, !p2, !p4, !p6))
-
-	isTermination := (f(pc, p0, !p1, !p2, !p3, !p4, !p5, !p6, !p7) ||
-		f(pc, p1, !p0, !p2, !p3, !p4, !p5, !p6, !p7) ||
-		f(pc, p2, !p0, !p1, !p3, !p4, !p5, !p6, !p7) ||
-		f(pc, p3, !p0, !p1, !p2, !p4, !p5, !p6, !p7) ||
-		f(pc, p4, !p0, !p1, !p2, !p3, !p5, !p6, !p7) ||
-		f(pc, p5, !p0, !p1, !p2, !p3, !p4, !p6, !p7) ||
-		f(pc, p6, !p0, !p1, !p2, !p3, !p4, !p5, !p7) ||
-		f(pc, p7, !p0, !p1, !p2, !p3, !p4, !p5, !p6))
+	and(x, o, x,
+		o, x, o,
+		o, o, x) ||
+		and(x, o, x,
+			o, x, o,
+			o, x, o) ||
+		and(x, o, x,
+			o, x, o,
+			x, o, o) ||
+		and(x, o, o,
+			o, x, x,
+			x, o, o) ||
+		and(x, o, o,
+			o, x, o,
+			x, o, x) ||
+		and(o, x, o,
+			o, x, o,
+			x, o, x) ||
+		and(o, o, x,
+			o, x, o,
+			x, o, x) ||
+		and(o, o, x,
+			x, x, o,
+			o, o, x) ||
+		and(x, o, x,
+			o, x, o,
+			o, o, x) ||
+		// Orthogonals
+		and(o, o, o,
+			x, x, x,
+			o, x, o) ||
+		and(o, x, o,
+			o, x, x,
+			o, x, o) ||
+		and(o, x, o,
+			x, x, x,
+			o, o, o) ||
+		and(o, x, o,
+			x, x, o,
+			o, x, o) ||
+		and(x, o, o,
+			o, x, x,
+			o, x, o) ||
+		and(o, x, o,
+			x, x, o,
+			o, o, x) ||
+		and(o, o, x,
+			x, x, o,
+			o, x, o) ||
+		and(o, x, o,
+			o, x, x,
+			x, o, o))
 
 	if isBifurcation {
 		return types.Bifurcation
-	} else if isTermination {
-		return types.Termination
-	} else {
-		return types.Unknown
 	}
+
+	isTermination := (
+	// Terminations
+	and(x, o, o,
+		o, x, o,
+		o, o, o) ||
+		and(o, x, o,
+			o, x, o,
+			o, o, o) ||
+		and(o, o, x,
+			o, x, o,
+			o, o, o) ||
+		and(o, o, o,
+			o, x, x,
+			o, o, o) ||
+		and(o, o, o,
+			o, x, o,
+			o, o, x) ||
+		and(o, o, o,
+			o, x, o,
+			o, x, o) ||
+		and(o, o, o,
+			o, x, o,
+			x, o, o) ||
+		and(o, o, o,
+			x, x, o,
+			o, o, o))
+
+	if isTermination {
+		return types.Termination
+	}
+
+	return types.Unknown
 }
+
+const (
+	x = true
+	o = false
+)
