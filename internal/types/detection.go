@@ -12,6 +12,7 @@ func (dr *DetectionResult) RelativeMinutia() MinutiaeList {
 	for _, minutiae := range dr.Minutia {
 		minutiae.X -= dr.Frame.Diagonal.Min.X
 		minutiae.Y -= dr.Frame.Diagonal.Min.Y
+		minutiae.Angle -= dr.Frame.Angle
 		list = append(list, minutiae)
 	}
 
