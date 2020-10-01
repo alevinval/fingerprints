@@ -6,14 +6,13 @@ build: clean
 	go build ./cmd/fingerprint-compare
 
 clean:
-	rm -rf out
 	rm -f fingerprint-corpus
 	rm -f fingerprint-extract
 	rm -f fingerprint-compare
 
 corpus: clean build
-	mkdir out
-	./fingerprint-corpus corpus/nist3.jpg out
+	mkdir -p out
+	./fingerprint-corpus corpus/nist1.jpg out
 
 generate-readme-examples: clean build
 	bash -c "./scripts/generate-readme-examples.sh"

@@ -35,8 +35,9 @@ func processImage(img image.Image, in *matrix.M) {
 	bounds := in.Bounds()
 	normalized := matrix.New(bounds)
 
-	metaIn := processing.Metadata(in)
-	processing.Normalize(in, normalized, metaIn)
+	inMeta := processing.Metadata(in)
+	processing.Normalize(in, normalized, inMeta)
+	normalizedMeta := processing.Metadata(normalized)
 	showMatrix("Normalized", normalized)
 
 	gx, gy := matrix.New(bounds), matrix.New(bounds)
@@ -44,30 +45,31 @@ func processImage(img image.Image, in *matrix.M) {
 	kernel.SobelDy.ConvoluteParallelized(normalized, gy)
 
 	// Compute filtered directional
-	filteredD, normFilteredD := matrix.New(bounds), matrix.New(bounds)
+	filteredD, filteredDNorm := matrix.New(bounds), matrix.New(bounds)
 	kernel.FilteredDirectional(gx, gy, 4).ConvoluteParallelized(filteredD, filteredD)
-	metaFilteredD := processing.Metadata(filteredD)
-	processing.Normalize(filteredD, normFilteredD, metaFilteredD)
-	showMatrix("Filtered Directional", normFilteredD)
+	filteredDMeta := processing.Metadata(filteredD)
+	processing.Normalize(filteredD, filteredDNorm, filteredDMeta)
+	showMatrix("Filtered Directional", filteredDNorm)
 
 	// Compute segmented image
-	segmented, normSegmented := matrix.New(bounds), matrix.New(bounds)
+	segmented, segmentedNorm := matrix.New(bounds), matrix.New(bounds)
 	kernel.Variance(filteredD).ConvoluteParallelized(normalized, segmented)
-	metaSegmented := processing.Metadata(segmented)
-	processing.Normalize(segmented, normSegmented, metaSegmented)
-	showMatrix("Filtered Directional Std Dev.", normSegmented)
+	segmentedMeta := processing.Metadata(segmented)
+	processing.Normalize(segmented, segmentedNorm, segmentedMeta)
+	segmentedNormMeta := processing.Metadata(segmentedNorm)
+	showMatrix("Filtered Directional Std Dev.", segmentedNorm)
 
 	// Compute binarized segmented image
 	binarizedSegmented, binarizedSegmentedNorm := matrix.New(bounds), matrix.New(bounds)
-	processing.Binarize(normSegmented, binarizedSegmented, metaIn)
+	processing.Binarize(segmentedNorm, binarizedSegmented, segmentedNormMeta)
 	processing.BinarizeEnhancement(binarizedSegmented)
-	metaBinarizedSegmented := processing.Metadata(binarizedSegmented)
-	processing.Normalize(binarizedSegmented, binarizedSegmentedNorm, metaBinarizedSegmented)
+	binarizedSegmentedMeta := processing.Metadata(binarizedSegmented)
+	processing.Normalize(binarizedSegmented, binarizedSegmentedNorm, binarizedSegmentedMeta)
 	showMatrix("Binarized Segmented", binarizedSegmentedNorm)
 
 	// Binarize normalized image
 	skeletonized := matrix.New(bounds)
-	processing.Binarize(normalized, skeletonized, metaIn)
+	processing.Binarize(normalized, skeletonized, normalizedMeta)
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 	showMatrix("Skeletonized", skeletonized)
