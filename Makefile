@@ -1,5 +1,7 @@
 .PHONY: corpus clean
 
+image ?= "nist3.jpg"
+
 build: clean
 	go build ./cmd/fingerprint-corpus
 	go build ./cmd/fingerprint-extract
@@ -12,7 +14,7 @@ clean:
 
 corpus: clean build
 	mkdir -p out
-	./fingerprint-corpus corpus/nist1.jpg out
+	./fingerprint-corpus corpus/$(image) out
 
 generate-readme-examples: clean build
 	bash -c "./scripts/generate-readme-examples.sh"

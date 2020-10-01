@@ -3,7 +3,6 @@ package processing
 import (
 	"image"
 	"log"
-	"math"
 	"sync"
 
 	"github.com/alevinval/fingerprints/internal/helpers"
@@ -18,7 +17,7 @@ const (
 
 func Binarize(in, out *matrix.M, meta types.Metadata) {
 	helpers.RunInParallel(in, 0, func(wg *sync.WaitGroup, bounds image.Rectangle) {
-		threshold := meta.MeanValue / (math.Pi / 2)
+		threshold := meta.MeanValue
 		doBinarize(in, out, bounds, threshold)
 		wg.Done()
 	})
@@ -69,7 +68,7 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 
 	erasedRegions := 0
 	for region, area := range histogram {
-		if float64(area) < math.Sqrt(mean) {
+		if float64(area) < mean {
 			eraseRegion(p, in, region)
 			erasedRegions++
 		}
