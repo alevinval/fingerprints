@@ -61,7 +61,7 @@ func processImage(img image.Image, in *matrix.M) {
 
 	// Compute binarized segmented image
 	binarizedSegmented, binarizedSegmentedNorm := matrix.New(bounds), matrix.New(bounds)
-	processing.Binarize(segmentedNorm, binarizedSegmented, segmentedNormMeta)
+	processing.BinarizeSegmented(segmentedNorm, binarizedSegmented, segmentedNormMeta)
 	processing.BinarizeEnhancement(binarizedSegmented)
 	binarizedSegmentedMeta := processing.Metadata(binarizedSegmented)
 	processing.Normalize(binarizedSegmented, binarizedSegmentedNorm, binarizedSegmentedMeta)
@@ -69,7 +69,7 @@ func processImage(img image.Image, in *matrix.M) {
 
 	// Binarize normalized image
 	skeletonized := matrix.New(bounds)
-	processing.Binarize(normalized, skeletonized, normalizedMeta)
+	processing.BinarizeSkeleton(normalized, skeletonized, normalizedMeta)
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 	showMatrix("Skeletonized", skeletonized)

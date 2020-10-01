@@ -30,11 +30,11 @@ func DetectionResult(in *matrix.M) *types.DetectionResult {
 	processing.Normalize(segmented, segmented, segmentedMeta)
 
 	binarizedSegmented := matrix.New(bounds)
-	processing.Binarize(segmented, binarizedSegmented, segmentedMeta)
+	processing.BinarizeSegmented(segmented, binarizedSegmented, segmentedMeta)
 	processing.BinarizeEnhancement(binarizedSegmented)
 
 	skeletonized := matrix.New(bounds)
-	processing.Binarize(normalized, skeletonized, normalizedMeta)
+	processing.BinarizeSkeleton(normalized, skeletonized, normalizedMeta)
 	processing.BinarizeEnhancement(skeletonized)
 	processing.Skeletonize(skeletonized)
 

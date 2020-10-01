@@ -3,6 +3,7 @@ package processing
 import (
 	"image"
 	"log"
+	"math"
 	"sync"
 
 	"github.com/alevinval/fingerprints/internal/helpers"
@@ -15,9 +16,20 @@ const (
 	white = 255
 )
 
-func Binarize(in, out *matrix.M, meta types.Metadata) {
+// BinarizeSegmented runs binarization with an optimized threshold that
+// ensures the segmented area is as big an continuous as possible
+func BinarizeSegmented(in, out *matrix.M, meta types.Metadata) {
+	binarize(in, out, math.Sqrt(meta.MeanValue))
+}
+
+// BinarizeSkeleton runs binarization with an optimized threshold that
+// does not damage the skeleton itself.
+func BinarizeSkeleton(in, out *matrix.M, meta types.Metadata) {
+	binarize(in, out, meta.MeanValue/(math.Pi/2))
+}
+
+func binarize(in, out *matrix.M, threshold float64) {
 	helpers.RunInParallel(in, 0, func(wg *sync.WaitGroup, bounds image.Rectangle) {
-		threshold := meta.MeanValue
 		doBinarize(in, out, bounds, threshold)
 		wg.Done()
 	})
@@ -68,7 +80,7 @@ func BinarizeEnhancement(in *matrix.M) *matrix.M {
 
 	erasedRegions := 0
 	for region, area := range histogram {
-		if float64(area) < mean {
+		if float64(area) < math.Sqrt(mean) {
 			eraseRegion(p, in, region)
 			erasedRegions++
 		}
