@@ -5,6 +5,10 @@ import (
 	"github.com/alevinval/fingerprints/internal/types"
 )
 
+// Minutia retrieves fingerprint features from a skeletonized image. Each
+// feature angle is obtained from the filtered directional image. Features
+// outside the fingerprint itself are removed by checking against the
+// segmented image, that tells us what is fingerprint from background.
 func Minutia(skeleton *matrix.M, filteredDirectional *matrix.M, segmented *matrix.M) types.MinutiaeList {
 	minutiaes := types.MinutiaeList{}
 	bounds := skeleton.Bounds()
