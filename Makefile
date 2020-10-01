@@ -13,7 +13,7 @@ clean:
 
 corpus: clean build
 	mkdir out
-	./fingerprint-corpus corpus/nist3.jpg
+	./fingerprint-corpus corpus/nist3.jpg out
 
 generate-readme-examples: clean build
 	bash -c "./scripts/generate-readme-examples.sh"

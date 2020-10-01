@@ -58,10 +58,12 @@ func processImage(img image.Image, in *matrix.M) {
 	showMatrix("Filtered Directional Std Dev.", normSegmented)
 
 	// Compute binarized segmented image
-	binarizedSegmented := matrix.New(bounds)
+	binarizedSegmented, binarizedSegmentedNorm := matrix.New(bounds), matrix.New(bounds)
 	processing.Binarize(normSegmented, binarizedSegmented, metaIn)
 	processing.BinarizeEnhancement(binarizedSegmented)
-	showMatrix("Binarized Segmented", binarizedSegmented)
+	metaBinarizedSegmented := processing.Metadata(binarizedSegmented)
+	processing.Normalize(binarizedSegmented, binarizedSegmentedNorm, metaBinarizedSegmented)
+	showMatrix("Binarized Segmented", binarizedSegmentedNorm)
 
 	// Binarize normalized image
 	skeletonized := matrix.New(bounds)
